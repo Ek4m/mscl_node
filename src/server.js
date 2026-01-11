@@ -1,11 +1,15 @@
 const express = require("express");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
 const AppDataSource = require("../db/init");
 const authRoute = require("./modules/auth/route");
-const { errorHandler } = require("./modules/common/middleware");
+const { errorHandler, logger } = require("./modules/common/middleware");
 
 const app = express();
+app.use(logger);
 app.use(express.json());
-
 app.use("/auth", authRoute);
 
 app.use(errorHandler);
@@ -13,6 +17,7 @@ app.use(errorHandler);
 AppDataSource.initialize()
   .then(() => {
     console.log("Database connected");
-    app.listen(3000, () => console.log("Server running on port 3000"));
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((error) => console.log(error));

@@ -23,12 +23,7 @@ const register = async (req, res) => {
   });
   delete user.password;
   await userRepository.save(user);
-  const token = signJwt(
-    { id: user.id, role: user.role },
-    {
-      expiresIn: "7d",
-    }
-  );
+  const token = signJwt(user);
   SuccessResponse(res, { token, user });
 };
 
@@ -39,12 +34,7 @@ const login = async (req, res) => {
   if (!user) return ErrorResponse(res, "Invalid username or password");
   const passwordValid = await bcrypt.compare(password, user.password);
   if (user && passwordValid) {
-    const token = signJwt(
-      { id: user.id, role: user.role },
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = signJwt(user);
     delete user.password;
     SuccessResponse(res, { token, user });
   } else {

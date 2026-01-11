@@ -5,15 +5,18 @@ const { ErrorResponse } = require("../common/helpers");
 const authorize = (roles = []) => {
   return (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
-    if (!token) ErrorResponse(res, "No token provided", 401);
-    try {
-      const decoded = verifyJwt(token);
-      if (roles.length && !roles.includes(decoded.role))
-        ErrorResponse(res, "Forbidden", 401);
-      req.user = decoded;
-      next();
-    } catch (err) {
-      ErrorResponse(res, "Invalid token", 401);
+    if (!token) {
+      ErrorResponse(res, "No token provided", 401);
+    } else {
+      try {
+        const decoded = verifyJwt(token);
+        if (roles.length && !roles.includes(decoded.role))
+          ErrorResponse(res, "Forbidden", 401);
+        req.user = decoded;
+        next();
+      } catch (err) {
+        ErrorResponse(res, "Invalid token", 401);
+      }
     }
   };
 };
