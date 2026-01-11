@@ -20,21 +20,19 @@ const authorize = (roles = []) => {
 
 const validateSchema = (schema) => async (req, res, next) => {
   try {
-    // Validate the body
     const parsedBody = await schema.parseAsync(req.body);
-    // Overwrite with cleaned data (removes extra fields)
     req.body = parsedBody;
     next();
   } catch (error) {
     if (error instanceof ZodError) {
-      console.log(error);
       ErrorResponse(
         res,
-        error.errors.map((e) => e.message),
+        error.issues.map((e) => e.message),
         400
       );
+    } else {
+      ErrorResponse(res, "Something went wrong", 500);
     }
-    ErrorResponse(res, "Something went wrong", 500);
   }
 };
 
