@@ -22,6 +22,7 @@ const authorize = (roles = []) => {
 };
 
 const validateSchema = (schema) => async (req, res, next) => {
+  console.log(req.body)
   try {
     const parsedBody = await schema.parseAsync(req.body);
     req.body = parsedBody;
