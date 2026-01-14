@@ -1,7 +1,25 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const fs = require("fs");
-const path = require("path");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash",
+  generationConfig: { responseMimeType: "application/json" },
+});
+
+const sendToAI = async (prompt, files = []) => {
+  const imageParts = files.map((file) =>
+    fileToGenerativePart(file.buffer, file.mimetype)
+  );
+  try {
+    const result = await model.generateContent([prompt, ...imageParts]);
+    const response = await result.response;
+    const resultText = response.text();
+    return JSON.parse(resultText);
+  } catch (error) {
+    throw error;
+  }
+};
+
 function fileToGenerativePart(buffer, mimeType) {
   return {
     inlineData: {
@@ -11,13 +29,7 @@ function fileToGenerativePart(buffer, mimeType) {
   };
 }
 
-async function detectObjects(files) {
-  const imagePath = path.join(__dirname, "img.jpg");
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-    generationConfig: { responseMimeType: "application/json" },
-  });
-
+async function detectObjects(files = []) {
   const prompt = `From input photos, identify ALL gym/fitness equipment that is clearly visible and return STRICT JSON only (nothing else). This includes machines, free weights, cardio equipment, attachments, and small training tools—literally everything that is gym-related equipment.
 INCLUDE (anything that is gym equipment), for example:
 - cardio: treadmill, elliptical trainer, stationary bike, spin bike, recumbent bike, rowing machine (erg), stair climber/stepmill, air bike/assault bike, ski erg
@@ -31,6 +43,7 @@ EXCLUDE (do NOT output):
 - people, body parts
 - ordinary clothing (t-shirts, pants) and casual shoes (unless clearly weightlifting shoes)
 - towels, water bottles, phones, headphones, mirrors, TVs
+- yoga, meditation etc. related things
 - generic furniture/decor (couches, office chairs, plants, lights, windows)
 - brand names/model numbers (use common equipment names only)
 Rules for correctness:
@@ -49,20 +62,43 @@ Output format rules (MANDATORY):
 - If no gym equipment is visible: {"equipment": []}
 
 Now analyze the provided photos and output the JSON.`;
-  const imageParts = files.map((file) =>
-    fileToGenerativePart(file.buffer, file.mimetype)
-  );
-
-  try {
-    const result = await model.generateContent([prompt, ...imageParts]);
-    const response = await result.response;
-    const resultText = response.text();
-    return JSON.parse(resultText);
-  } catch (error) {
-    console.error("Error detecting objects:", error);
-  }
+  return sendToAI(prompt, files);
 }
+
+const generateWorkoutProgram = async (equipments, level, days) => {
+  const prompt = `You are an experienced, science-based gym trainer. 
+Your task is to create a structured workout program based on the following user constraints:
+- Level: ${level}
+- Frequency: ${days} days per week
+- Available Equipment: ${equipments.join(", ")}
+OUTPUT INSTRUCTIONS:
+Return ONLY a raw JSON response. No prose, no markdown code blocks, no explanations, and no conversational filler. The response must be valid JSON and nothing else. Not inside array just raw json object
+JSON STRUCTURE:
+{
+  "title": "A professional and catchy name for the program",
+  "level": "${level}",
+  "days": [
+    {
+      "title": "Muscle group(s) focus (e.g., 'Chest & Triceps' or 'Full Body')",
+      "moves": [
+        {
+          "name": "Exact exercise name",
+          "sets": 0,
+          "reps": "Range or number (e.g., '8-10' or '12')"
+        }
+      ]
+    }
+  ]
+}
+
+SCIENCE-BASED REQUIREMENTS:
+1. Ensure recovery time between muscle groups is optimized for a ${days}-day split.
+2. Select movements that utilize only the available equipment listed.
+3. For ${level} level, ensure appropriate volume (sets/reps) and exercise complexity.`;
+  return sendToAI(prompt);
+};
 
 module.exports = {
   detectObjects,
+  generateWorkoutProgram,
 };
