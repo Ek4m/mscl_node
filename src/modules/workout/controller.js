@@ -21,7 +21,6 @@ const getEquipments = async (req, res) => {
   }
 };
 const generateProgram = async (req, res) => {
-  console.log(req.user);
   const { equipments, numOfDays, level } = req.body;
   try {
     const response = isDev

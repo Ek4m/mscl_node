@@ -8,6 +8,10 @@ const { generateProgramSchema } = require("./schemas");
 const upload = multer({ storage: multer.memoryStorage() });
 
 route.post("/detect", upload.array("images", 6), getEquipments);
-route.post("/generate-program", validateSchema(generateProgramSchema), generateProgram);
+route.post(
+  "/generate-program",
+  validateSchema(generateProgramSchema),
+  generateProgram
+);
 
 module.exports = route;
