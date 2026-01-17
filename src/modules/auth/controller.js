@@ -21,8 +21,8 @@ const register = async (req, res) => {
     role,
     username,
   });
-  delete user.password;
   await userRepository.save(user);
+  delete user.password;
   const token = signJwt(user);
   SuccessResponse(res, { token, user });
 };
@@ -46,6 +46,7 @@ const profile = async (req, res) => {
   const user = await getRepo(User).findOneBy({
     id: req.user.id,
   });
+  delete user.password;
   SuccessResponse(res, { user });
 };
 

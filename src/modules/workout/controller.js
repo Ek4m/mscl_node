@@ -22,22 +22,45 @@ const getEquipments = async (req, res) => {
 };
 const generateProgram = async (req, res) => {
   const { equipments, numOfDays, level } = req.body;
-  try {
-    const response = isDev
-      ? dummyProgram
-      : await generateWorkoutProgram(equipments, level, numOfDays);
-    const newProgram = await getRepo(Program).save({
-      ...response,
-      userId: req.user.id,
-    });
-    SuccessResponse(res, newProgram);
-  } catch (error) {
-    console.error("Error during image classification:", error);
-    ErrorResponse(res, "Internal Server Error");
-  }
+  const response = isDev
+    ? dummyProgram
+    : await generateWorkoutProgram(equipments, level, numOfDays);
+  const newProgram = await getRepo(Program).save({
+    ...response,
+    userId: req.user.id,
+  });
+  SuccessResponse(res, newProgram);
+};
+
+const getUsersPlans = async (req, res) => {
+  const plans = await getRepo(Program).find({
+    where: { userId: req.user.id },
+    relations: {
+      days: {
+        moves: true,
+      },
+    },
+  });
+  SuccessResponse(res, plans);
+};
+
+const getPlanById = async (req, res) => {
+  const { id } = req.params;
+  if (!id) ErrorResponse(res, "No parameter provided");
+  const plans = await getRepo(Program).findOne({
+    where: { userId: req.user.id, id },
+    relations: {
+      days: {
+        moves: true,
+      },
+    },
+  });
+  SuccessResponse(res, plans);
 };
 
 module.exports = {
   getEquipments,
   generateProgram,
+  getUsersPlans,
+  getPlanById,
 };
