@@ -1,5 +1,5 @@
 const { EntitySchema } = require("typeorm");
-const { UserRoles } = require("../src/modules/auth/enums");
+const { UserRoles } = require("../modules/auth/enums");
 
 const User = new EntitySchema({
   name: "User",

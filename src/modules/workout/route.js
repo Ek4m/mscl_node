@@ -1,5 +1,5 @@
 const route = require("express").Router();
-const multer = require("multer");
+const uploader = require("../../config/multer/init");
 
 const {
   getEquipments,
@@ -10,9 +10,7 @@ const {
 const { validateSchema } = require("../auth/middlewares");
 const { generateProgramSchema } = require("./schemas");
 
-const upload = multer({ storage: multer.memoryStorage() });
-
-route.post("/detect", upload.array("images", 6), getEquipments);
+route.post("/detect", uploader.array("images", 6), getEquipments);
 route.get("/plans", getUsersPlans);
 route.get("/plans/:id", getPlanById);
 route.post(

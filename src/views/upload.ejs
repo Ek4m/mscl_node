@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <form class="flex flex-col items-center max-w-[300px] m-auto mt-5" method="post" action="/test/upload"
+        enctype="multipart/form-data">
+        <input class="w-full border-1 p-2" type="text" name="slug" placeholder="slug" />
+        <input name="file" class="my-2" type="file">
+        <button class="w-full bg-[lightblue] p-2 mt-2" type="submit">Submit</button>
+    </form>
+</body>
+
+</html>

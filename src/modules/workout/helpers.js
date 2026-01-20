@@ -84,7 +84,8 @@ JSON STRUCTURE:
         {
           "name": "Exact exercise name",
           "sets": 0,
-          "reps": "Range or number (e.g., '8-10' or '12')"
+          "reps": "in number type (e.g., '8-10' or '12') ",
+          "slug":"exercise slug like (pec-deck-fly, dumbbell-flyes, machine-chest-press etc)"
         }
       ]
     }

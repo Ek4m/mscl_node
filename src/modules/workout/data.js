@@ -144,22 +144,6 @@ const dummyProgram = {
     },
   ],
 };
-
-const dummyEquipments = [
-  "dumbbell",
-  "pull-up bar",
-  "weight plate",
-  "barbell",
-  "sled",
-  "dip station",
-  "rack",
-  "plate tree/plate storage rack",
-  "kettlebell",
-  "medicine ball",
-  "yoga mat",
-  "rowing machine",
-];
 module.exports = {
   dummyProgram,
-  dummyEquipments,
 };

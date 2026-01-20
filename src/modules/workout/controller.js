@@ -1,4 +1,4 @@
-const Program = require("../../../entities/Program");
+const Program = require("../../entities/Program");
 const { dummyProgram, dummyEquipments } = require("./data");
 
 const { SuccessResponse, ErrorResponse } = require("../common/helpers");

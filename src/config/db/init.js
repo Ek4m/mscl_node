@@ -1,8 +1,8 @@
 const { DataSource } = require("typeorm");
-const User = require("../entities/User");
-const WorkoutDay = require("../entities/WorkoutDay");
-const WorkoutMove = require("../entities/WorkoutMove");
-const Program = require("../entities/Program");
+const User = require("../../entities/User");
+const WorkoutDay = require("../../entities/WorkoutDay");
+const WorkoutMove = require("../../entities/WorkoutMove");
+const Program = require("../../entities/Program");
 
 const AppDataSource = new DataSource({
   type: "mysql",

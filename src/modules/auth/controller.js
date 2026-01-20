@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 
-const User = require("../../../entities/User");
+const User = require("../../entities/User");
 
 const { SuccessResponse, ErrorResponse } = require("../common/helpers");
 const { signJwt } = require("../jwt/helpers");
