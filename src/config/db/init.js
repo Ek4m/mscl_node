@@ -3,6 +3,7 @@ const User = require("../../entities/User");
 const WorkoutDay = require("../../entities/WorkoutDay");
 const WorkoutMove = require("../../entities/WorkoutMove");
 const Program = require("../../entities/Program");
+const Exercise = require("../../entities/Exercise");
 
 const AppDataSource = new DataSource({
   type: "mysql",
@@ -12,6 +13,6 @@ const AppDataSource = new DataSource({
   password: "",
   database: "muscle_app",
   synchronize: true,
-  entities: [User, WorkoutDay, WorkoutMove, Program],
+  entities: [User, WorkoutDay, WorkoutMove, Program, Exercise],
 });
 module.exports = AppDataSource;

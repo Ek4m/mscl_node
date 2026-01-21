@@ -1,6 +1,5 @@
 const EXERCISES_SLUGS = [
   "barbell-bench-press",
-  "incline-dumbbell-press",
   "decline-bench-press",
   "dumbbell-flyes",
   "pushups",
@@ -17,6 +16,8 @@ const EXERCISES_SLUGS = [
   "pullups",
   "chinups",
   "lat-pulldown",
+  "incline-dumbbell-press",
+
   "seated-cable-row",
   "one-arm-dumbbell-row",
   "t-bar-row",
@@ -37,6 +38,7 @@ const EXERCISES_SLUGS = [
   "push-press",
   "handstand-pushups",
   "bus-driver",
+  
   "clean-and-press",
   "back-squat",
   "front-squat",

@@ -25,6 +25,14 @@ const User = new EntitySchema({
       type: "varchar",
       unique: true,
     },
+    createdAt: {
+      type: "timestamp",
+      createDate: true,
+    },
+    updatedAt: {
+      type: "timestamp",
+      updateDate: true,
+    },
   },
 });
 module.exports = User;
