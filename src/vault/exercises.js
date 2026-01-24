@@ -38,7 +38,7 @@ const EXERCISES_SLUGS = [
   "push-press",
   "handstand-pushups",
   "bus-driver",
-  
+
   "clean-and-press",
   "back-squat",
   "front-squat",
@@ -58,6 +58,7 @@ const EXERCISES_SLUGS = [
   "calf-raises",
   "seated-calf-raise",
   "pistol-squats",
+
   "wall-sit",
   "walking-lunges",
   "barbell-curls",
@@ -78,6 +79,7 @@ const EXERCISES_SLUGS = [
   "russian-twists",
   "hanging-leg-raises",
   "bicycle-crunches",
+
   "ab-wheel-rollouts",
   "v-sits",
   "mountain-climbers",
@@ -98,6 +100,7 @@ const EXERCISES_SLUGS = [
   "kettlebell-swings",
   "thrusters",
   "wall-balls",
+
   "box-step-overs",
   "bear-crawls",
   "assault-bike",
@@ -118,6 +121,7 @@ const EXERCISES_SLUGS = [
   "spider-man-pushups",
   "superman",
   "plank-jacks",
+
   "windmills",
   "halo",
   "cossack-squats",
@@ -138,6 +142,7 @@ const EXERCISES_SLUGS = [
   "kipping-pullups",
   "double-unders",
   "wall-walks",
+
   "jefferson-curls",
   "duck-walk",
   "crab-walk",
@@ -158,6 +163,7 @@ const EXERCISES_SLUGS = [
   "overhead-squat",
   "ghd-situps",
   "echo-bike",
+
   "stair-climber",
   "treadmill-run",
   "elliptical",
@@ -178,6 +184,7 @@ const EXERCISES_SLUGS = [
   "scissor-kicks",
   "leg-pull-in",
   "oblique-crunches",
+  
   "toe-touches",
   "side-leg-raises",
   "clamshells",

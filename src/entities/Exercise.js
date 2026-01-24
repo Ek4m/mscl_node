@@ -32,10 +32,6 @@ module.exports = new EntitySchema({
       type: "varchar",
       nullable: true,
     },
-    equipment: {
-      type: "varchar",
-      default: "none",
-    },
     createdAt: {
       type: "timestamp",
       createDate: true,
@@ -43,6 +39,23 @@ module.exports = new EntitySchema({
     updatedAt: {
       type: "timestamp",
       updateDate: true,
+    },
+  },
+  relations: {
+    equipment: {
+      type: "many-to-many",
+      target: "Equipment",
+      joinTable: {
+        name: "exercise_equipment",
+        joinColumn: {
+          name: "exerciseId",
+          referencedColumnName: "id",
+        },
+        inverseJoinColumn: {
+          name: "equipmentId",
+          referencedColumnName: "id",
+        },
+      },
     },
   },
 });

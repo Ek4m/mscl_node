@@ -1,4 +1,3 @@
-const Program = require("../../entities/Program");
 const { dummyProgram, dummyEquipments } = require("./data");
 
 const { SuccessResponse, ErrorResponse } = require("../common/helpers");
@@ -47,15 +46,7 @@ const getUsersPlans = async (req, res) => {
 const getPlanById = async (req, res) => {
   const { id } = req.params;
   if (!id) ErrorResponse(res, "No parameter provided");
-  const plans = await getRepo(Program).findOne({
-    where: { userId: req.user.id, id },
-    relations: {
-      days: {
-        moves: true,
-      },
-    },
-  });
-  SuccessResponse(res, plans);
+  SuccessResponse(res, []);
 };
 
 module.exports = {
