@@ -14,6 +14,22 @@ const generateProgramSchema = z.object({
     .max(7, { message: "Number of days cannot exceed 7" }),
 });
 
+const workoutPlanSchema = z.object({
+  plan: z.array(
+    z.object({
+      dayNumber: z.number(),
+      exercises: z.array(
+        z.object({
+          id: z.number(),
+          reps: z.string().min(1, "All exercises must have reps entered"),
+          sets: z.string().min(1, "All exercises must have set entered"),
+        }),
+      ), // Allows empty array by default
+    }),
+  ),
+});
+
 module.exports = {
   generateProgramSchema,
+  workoutPlanSchema,
 };

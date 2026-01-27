@@ -8,7 +8,7 @@ const model = genAI.getGenerativeModel({
 
 const sendToAI = async (prompt, files = []) => {
   const imageParts = files.map((file) =>
-    fileToGenerativePart(file.buffer, file.mimetype)
+    fileToGenerativePart(file.buffer, file.mimetype),
   );
   try {
     const result = await model.generateContent([prompt, ...imageParts]);
@@ -99,7 +99,30 @@ SCIENCE-BASED REQUIREMENTS:
   return sendToAI(prompt);
 };
 
+const transformToWorkoutPlan = (body, userId) => {
+  const date = new Date();
+  return {
+    title: body.title || `${userId}-${date.getTime()}`,
+    description: `${body.plan.filter((d) => d.exercises.length > 0).length}-day training split`,
+    days: body.plan
+      .filter((day) => day.exercises.length > 0)
+      .map((day) => ({
+        title: `Day ${day.dayNumber}`,
+        description: Array.from(
+          new Set(day.exercises.flatMap((ex) => ex.muscle)),
+        ).join(", "),
+        exercises: day.exercises.map((ex, index) => ({
+          orderIndex: index + 1,
+          exercise: { id: ex.id },
+          targetSets: parseInt(ex.sets, 10) || 0,
+          targetReps: parseInt(ex.reps, 10) || 0,
+        })),
+      })),
+  };
+};
+
 module.exports = {
   detectObjects,
   generateWorkoutProgram,
+  transformToWorkoutPlan,
 };

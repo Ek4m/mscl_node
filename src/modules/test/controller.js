@@ -21,18 +21,6 @@ const loadToExercises = async (req, res) => {
               targetSets: 3,
               targetReps: 10,
             },
-            {
-              orderIndex: 2,
-              exercise: { id: 80 }, // Dumbbell Flyes
-              targetSets: 3,
-              targetReps: 12,
-            },
-            {
-              orderIndex: 3,
-              exercise: { id: 105 }, // Overhead Press
-              targetSets: 3,
-              targetReps: 10,
-            },
           ],
         },
         {
@@ -44,42 +32,6 @@ const loadToExercises = async (req, res) => {
               exercise: { id: 91 }, // Bent-Over Barbell Row
               targetSets: 3,
               targetReps: 10,
-            },
-            {
-              orderIndex: 2,
-              exercise: { id: 92 }, // Pullups
-              targetSets: 3,
-              targetReps: 8,
-            },
-            {
-              orderIndex: 3,
-              exercise: { id: 99 }, // Face Pulls
-              targetSets: 3,
-              targetReps: 12,
-            },
-          ],
-        },
-        {
-          title: "Legs",
-          description: "Quads, Hamstrings, Glutes",
-          exercises: [
-            {
-              orderIndex: 1,
-              exercise: { id: 117 }, // Back Squat
-              targetSets: 4,
-              targetReps: 10,
-            },
-            {
-              orderIndex: 2,
-              exercise: { id: 124 }, // Goblet Squat
-              targetSets: 3,
-              targetReps: 12,
-            },
-            {
-              orderIndex: 3,
-              exercise: { id: 132 }, // Calf Raises
-              targetSets: 4,
-              targetReps: 15,
             },
           ],
         },

@@ -3,7 +3,15 @@ const { dummyProgram, dummyEquipments } = require("./data");
 const { SuccessResponse, ErrorResponse } = require("../common/helpers");
 const { getRepo } = require("../auth/helpers");
 const { isDev } = require("../../helpers");
-const { detectObjects, generateWorkoutProgram } = require("./helpers");
+const {
+  detectObjects,
+  generateWorkoutProgram,
+  transformToWorkoutPlan,
+} = require("./helpers");
+
+const Plan = require("../../entities/Plan");
+const Equipment = require("../../entities/Equipment");
+const Exercise = require("../../entities/Exercise");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -32,12 +40,9 @@ const generateProgram = async (req, res) => {
 };
 
 const getUsersPlans = async (req, res) => {
-  const plans = await getRepo(Program).find({
-    where: { userId: req.user.id },
+  const plans = await getRepo(Plan).find({
     relations: {
-      days: {
-        moves: true,
-      },
+      days: true,
     },
   });
   SuccessResponse(res, plans);
@@ -49,9 +54,29 @@ const getPlanById = async (req, res) => {
   SuccessResponse(res, []);
 };
 
+const getLists = async (req, res) => {
+  const exRepo = getRepo(Exercise);
+  const equipmentRepo = getRepo(Equipment);
+  const exercises = await exRepo.find();
+  const equipments = await equipmentRepo.find();
+  SuccessResponse(res, { exercises, equipments });
+};
+
+const createPlan = async (req, res) => {
+  const { plan, title } = req.body;
+  if (!plan || !Array.isArray(plan) || !plan.length)
+    ErrorResponse(res, "Provided plan credentials are not valid. Check again");
+  const planRepo = getRepo(Plan);
+  const mappedBody = transformToWorkoutPlan({ plan, title }, req.user.id);
+  const newPlan = await planRepo.save(mappedBody);
+  SuccessResponse(res, newPlan);
+};
+
 module.exports = {
   getEquipments,
   generateProgram,
   getUsersPlans,
   getPlanById,
+  getLists,
+  createPlan,
 };
