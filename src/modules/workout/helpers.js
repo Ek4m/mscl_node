@@ -118,6 +118,7 @@ const transformToWorkoutPlan = (body, userId) => {
           targetReps: parseInt(ex.reps, 10) || 0,
         })),
       })),
+    createdBy: userId,
   };
 };
 

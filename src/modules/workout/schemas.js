@@ -15,6 +15,7 @@ const generateProgramSchema = z.object({
 });
 
 const workoutPlanSchema = z.object({
+  title: z.string(),
   plan: z.array(
     z.object({
       dayNumber: z.number(),

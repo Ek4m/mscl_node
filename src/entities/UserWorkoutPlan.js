@@ -37,7 +37,6 @@ module.exports = new EntitySchema({
       onDelete: "CASCADE",
     },
 
-    // One plan has many days
     days: {
       type: "one-to-many",
       target: "UserWorkoutDay",

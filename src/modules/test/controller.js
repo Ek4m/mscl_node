@@ -4,6 +4,7 @@ const Exercise = require("../../entities/Exercise");
 const { SuccessResponse } = require("../common/helpers");
 const exercisesToInsert = require("../../vault/exerciseSeeds");
 const Plan = require("../../entities/Plan");
+const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 
 const loadToExercises = async (req, res) => {
   const plans = [
@@ -118,8 +119,23 @@ const uploadPost = (req, res) => {
   res.redirect("/test/upload");
 };
 
+const getPlan = async (req, res) => {
+  const usersProgram = await getRepo(UserWorkoutPlan).findOne({
+    where: { id: 22 },
+    relations: {
+      days: {
+        exercises: {
+          exercise: true,
+        },
+      },
+    },
+  });
+  SuccessResponse(res, usersProgram);
+};
+
 module.exports = {
   uploadGet,
   uploadPost,
   loadToExercises,
+  getPlan,
 };

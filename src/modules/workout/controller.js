@@ -12,6 +12,7 @@ const {
 const Plan = require("../../entities/Plan");
 const Equipment = require("../../entities/Equipment");
 const Exercise = require("../../entities/Exercise");
+const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -64,12 +65,32 @@ const getLists = async (req, res) => {
 
 const createPlan = async (req, res) => {
   const { plan, title } = req.body;
+  const userId = req.user.id;
   if (!plan || !Array.isArray(plan) || !plan.length)
     ErrorResponse(res, "Provided plan credentials are not valid. Check again");
   const planRepo = getRepo(Plan);
   const mappedBody = transformToWorkoutPlan({ plan, title }, req.user.id);
   const newPlan = await planRepo.save(mappedBody);
-  SuccessResponse(res, newPlan);
+  const newPlanRecord = {
+    title: newPlan.title,
+    user: {
+      id: userId,
+    },
+    template: {
+      id: newPlan.id,
+    },
+    days: newPlan.days.map((day) => ({
+      exercises: day.exercises.map((ex) => ({
+        targetReps: ex.targetReps,
+        targetSets: ex.targetSets,
+        exercise: {
+          id: ex.id,
+        },
+      })),
+    })),
+  };
+  const newRecord = await getRepo(UserWorkoutPlan).save(newPlanRecord);
+  SuccessResponse(res, newRecord);
 };
 
 module.exports = {
