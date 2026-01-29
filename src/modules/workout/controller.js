@@ -51,8 +51,27 @@ const getUsersPlans = async (req, res) => {
 
 const getPlanById = async (req, res) => {
   const { id } = req.params;
-  if (!id) ErrorResponse(res, "No parameter provided");
-  SuccessResponse(res, []);
+  const clientId = req.user.id;
+  if (!id) {
+    ErrorResponse(res, "No parameter provided");
+  } else {
+    const usersProgram = await getRepo(UserWorkoutPlan).findOne({
+      where: {
+        id,
+        user: {
+          id: clientId,
+        },
+      },
+      relations: {
+        days: {
+          exercises: {
+            exercise: true,
+          },
+        },
+      },
+    });
+    SuccessResponse(res, usersProgram);
+  }
 };
 
 const getLists = async (req, res) => {
@@ -70,7 +89,7 @@ const createPlan = async (req, res) => {
     ErrorResponse(res, "Provided plan credentials are not valid. Check again");
   const planRepo = getRepo(Plan);
   const mappedBody = transformToWorkoutPlan({ plan, title }, req.user.id);
-  const newPlan = await planRepo.save(mappedBody);
+  let newPlan = await planRepo.save(mappedBody);
   const newPlanRecord = {
     title: newPlan.title,
     user: {
@@ -89,8 +108,8 @@ const createPlan = async (req, res) => {
       })),
     })),
   };
-  const newRecord = await getRepo(UserWorkoutPlan).save(newPlanRecord);
-  SuccessResponse(res, newRecord);
+  const customPlan = await getRepo(UserWorkoutPlan).save(newPlanRecord);
+  SuccessResponse(res, { newPlan: customPlan });
 };
 
 module.exports = {

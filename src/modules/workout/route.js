@@ -21,7 +21,7 @@ route.post(
 route.post("/plan/custom-create", validateSchema(workoutPlanSchema), createPlan);
 
 route.get("/plans", getUsersPlans);
-route.get("/plans/:id", getPlanById);
+route.get("/user-plan/:id", getPlanById);
 
 route.get("/data/all", getLists);
 
