@@ -1,9 +1,11 @@
 const { ZodError } = require("zod");
 const { verifyJwt } = require("../jwt/helpers");
 const { ErrorResponse } = require("../common/helpers");
+const { getRepo } = require("./helpers");
+const User = require("../../entities/User");
 
 const authorize = (roles = []) => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
       ErrorResponse(res, "No token provided", 401);
@@ -12,6 +14,8 @@ const authorize = (roles = []) => {
         const decoded = verifyJwt(token);
         if (roles.length && !roles.includes(decoded.role))
           ErrorResponse(res, "Forbidden", 401);
+        const user = await getRepo(User).findOne({ where: { id: decoded.id } });
+        if (user.frozenAt) ErrorResponse(res, "Forbidden", 401);
         req.user = decoded;
         next();
       } catch (err) {
@@ -31,7 +35,7 @@ const validateSchema = (schema) => async (req, res, next) => {
       ErrorResponse(
         res,
         error.issues.map((e) => e.message),
-        400
+        400,
       );
     } else {
       ErrorResponse(res, "Something went wrong", 500);

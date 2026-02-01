@@ -14,6 +14,10 @@ const User = new EntitySchema({
       type: "varchar",
       unique: true,
     },
+    frozenAt: {
+      deleteDate: true,
+      type: "timestamp",
+    },
     password: {
       type: "varchar",
     },

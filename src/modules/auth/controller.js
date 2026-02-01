@@ -50,8 +50,18 @@ const profile = async (req, res) => {
   SuccessResponse(res, { user });
 };
 
+const freeze = async (req, res) => {
+  const repo = getRepo(User);
+  const user = await repo.findOneBy({
+    id: req.user.id,
+  });
+  await repo.update(user.id, { frozenAt: new Date() });
+  SuccessResponse(res, { deteled: true });
+};
+
 module.exports = {
   register,
   login,
   profile,
+  freeze,
 };

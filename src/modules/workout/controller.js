@@ -41,7 +41,7 @@ const generateProgram = async (req, res) => {
 };
 
 const getUsersPlans = async (req, res) => {
-  const plans = await getRepo(Plan).find({
+  const plans = await getRepo(UserWorkoutPlan).find({
     relations: {
       days: true,
     },
