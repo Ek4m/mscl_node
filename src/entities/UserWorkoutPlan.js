@@ -21,6 +21,11 @@ module.exports = new EntitySchema({
       createDate: true,
     },
 
+    isActive: {
+      type: "boolean",
+      default: false,
+    },
+
     updatedAt: {
       type: "timestamp",
       updateDate: true,

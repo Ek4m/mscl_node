@@ -74,14 +74,6 @@ const getPlanById = async (req, res) => {
   }
 };
 
-const getLists = async (req, res) => {
-  const exRepo = getRepo(Exercise);
-  const equipmentRepo = getRepo(Equipment);
-  const exercises = await exRepo.find();
-  const equipments = await equipmentRepo.find();
-  SuccessResponse(res, { exercises, equipments });
-};
-
 const createPlan = async (req, res) => {
   const { plan, title } = req.body;
   const userId = req.user.id;
@@ -117,6 +109,5 @@ module.exports = {
   generateProgram,
   getUsersPlans,
   getPlanById,
-  getLists,
   createPlan,
 };

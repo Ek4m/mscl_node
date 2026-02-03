@@ -6,6 +6,7 @@ dotenv.config();
 const AppDataSource = require("./config/db/init");
 
 const authRoute = require("./modules/auth/route");
+const commonRoute = require("./modules/common/route");
 const workoutRoute = require("./modules/workout/route");
 const testRoute = require("./modules/test/route");
 
@@ -20,6 +21,8 @@ app.set("views", __dirname + "/views");
 
 app.use("/auth", authRoute);
 app.use("/workout", authorize(), workoutRoute);
+app.use("/common", commonRoute);
+
 app.use(errorHandler);
 
 if (process.env.NODE_ENV) {

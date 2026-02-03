@@ -6,7 +6,6 @@ const {
   generateProgram,
   getUsersPlans,
   getPlanById,
-  getLists,
   createPlan,
 } = require("./controller");
 const { validateSchema } = require("../auth/middlewares");
@@ -22,7 +21,5 @@ route.post("/plan/custom-create", validateSchema(workoutPlanSchema), createPlan)
 
 route.get("/plans", getUsersPlans);
 route.get("/user-plan/:id", getPlanById);
-
-route.get("/data/all", getLists);
 
 module.exports = route;
