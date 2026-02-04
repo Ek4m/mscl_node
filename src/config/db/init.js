@@ -13,11 +13,11 @@ const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const UserWorkoutSet = require("../../entities/UserWorkoutSet");
 
 const AppDataSource = new DataSource({
-  type: "mysql",
+  type: "postgres",
   host: "localhost",
-  port: 3306,
-  username: "root",
-  password: "",
+  port: 5432,
+  username: "postgres",
+  password: "salmanov99",
   database: "muscle_app",
   synchronize: true,
   entities: [

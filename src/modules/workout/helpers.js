@@ -106,13 +106,14 @@ const transformToWorkoutPlan = (body, userId) => {
     description: `${body.plan.filter((d) => d.exercises.length > 0).length}-day training split`,
     days: body.plan
       .filter((day) => day.exercises.length > 0)
-      .map((day) => ({
+      .map((day, index) => ({
+        dayIndex: index + 1,
         title: `Day ${day.dayNumber}`,
         description: Array.from(
           new Set(day.exercises.flatMap((ex) => ex.muscle)),
         ).join(", "),
-        exercises: day.exercises.map((ex, index) => ({
-          orderIndex: index + 1,
+        exercises: day.exercises.map((ex, exIndex) => ({
+          orderIndex: exIndex + 1,
           exercise: { id: ex.id },
           targetSets: parseInt(ex.sets, 10) || 0,
           targetReps: parseInt(ex.reps, 10) || 0,

@@ -82,6 +82,7 @@ const createPlan = async (req, res) => {
   const planRepo = getRepo(Plan);
   const mappedBody = transformToWorkoutPlan({ plan, title }, req.user.id);
   let newPlan = await planRepo.save(mappedBody);
+
   const newPlanRecord = {
     title: newPlan.title,
     user: {
@@ -90,16 +91,20 @@ const createPlan = async (req, res) => {
     template: {
       id: newPlan.id,
     },
-    days: newPlan.days.map((day) => ({
-      exercises: day.exercises.map((ex) => ({
+    days: newPlan.days.map((day, index) => ({
+      dayIndex: index + 1,
+      exercises: day.exercises.map((ex, exIndex) => ({
         targetReps: ex.targetReps,
+        orderIndex: exIndex + 1,
         targetSets: ex.targetSets,
         exercise: {
-          id: ex.id,
+          id: ex.exercise.id,
         },
       })),
     })),
   };
+    console.log(JSON.stringify(newPlanRecord));
+
   const customPlan = await getRepo(UserWorkoutPlan).save(newPlanRecord);
   SuccessResponse(res, { newPlan: customPlan });
 };

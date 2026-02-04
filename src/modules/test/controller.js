@@ -5,99 +5,90 @@ const { SuccessResponse } = require("../common/helpers");
 const exercisesToInsert = require("../../vault/exerciseSeeds");
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
+const Equipment = require("../../entities/Equipment");
+const { MuscleGroups } = require("../workout/vault");
 
 const loadToExercises = async (req, res) => {
-  const plans = [
+  const exercises = [
     {
-      title: "Push / Pull / Legs - Beginner",
-      description: "A beginner-friendly 3-day split plan",
-      days: [
-        {
-          title: "Push",
-          description: "Chest, Shoulders, Triceps",
-          exercises: [
-            {
-              orderIndex: 1,
-              exercise: { id: 78 }, // Barbell Bench Press
-              targetSets: 3,
-              targetReps: 10,
-            },
-          ],
-        },
-        {
-          title: "Pull",
-          description: "Back, Biceps",
-          exercises: [
-            {
-              orderIndex: 1,
-              exercise: { id: 91 }, // Bent-Over Barbell Row
-              targetSets: 3,
-              targetReps: 10,
-            },
-          ],
-        },
+      title: "Incline Dumbbell Press",
+      slug: "incline-dumbbell-press",
+      description: "Focuses on the upper portion of the chest.",
+      steps: [
+        "Set bench to 30-45 degree angle",
+        "Press dumbbells upward until arms are straight",
+        "Lower weights slowly to the upper chest level",
       ],
+      primaryMuscles: [MuscleGroups.UpperChest],
+      secondaryMuscles: [MuscleGroups.FrontDelts, MuscleGroups.Triceps],
+      equipment: [{ id: 1 }, { id: 8 }], // Dumbbells, Adjustable Bench
     },
     {
-      title: "Full Body - Intermediate",
-      description: "An intermediate full-body plan with compound lifts",
-      days: [
-        {
-          title: "Full Body Day 1",
-          description: "Heavy compound lifts",
-          exercises: [
-            {
-              orderIndex: 1,
-              exercise: { id: 78 }, // Barbell Bench Press
-              targetSets: 4,
-              targetReps: 6,
-            },
-            {
-              orderIndex: 2,
-              exercise: { id: 90 }, // Deadlift
-              targetSets: 3,
-              targetReps: 5,
-            },
-            {
-              orderIndex: 3,
-              exercise: { id: 117 }, // Back Squat
-              targetSets: 4,
-              targetReps: 6,
-            },
-          ],
-        },
-        {
-          title: "Full Body Day 2",
-          description: "Accessory and isolation work",
-          exercises: [
-            {
-              orderIndex: 1,
-              exercise: { id: 137 }, // Barbell Curls
-              targetSets: 3,
-              targetReps: 12,
-            },
-            {
-              orderIndex: 2,
-              exercise: { id: 142 }, // Tricep Pushdowns
-              targetSets: 3,
-              targetReps: 12,
-            },
-            {
-              orderIndex: 3,
-              exercise: { id: 107 }, // Lateral Raises
-              targetSets: 3,
-              targetReps: 15,
-            },
-          ],
-        },
+      title: "Deadlift",
+      slug: "deadlift",
+      description: "A powerhouse move for the entire posterior chain.",
+      steps: [
+        "Stand with feet mid-foot under the bar",
+        "Grip the bar, bend knees until shins touch bar",
+        "Lift the bar by standing up with a flat back",
       ],
+      primaryMuscles: [MuscleGroups.LowerBack, MuscleGroups.Glutes],
+      secondaryMuscles: [
+        MuscleGroups.Hamstrings,
+        MuscleGroups.Forearms,
+        MuscleGroups.Traps,
+      ],
+      equipment: [{ id: 2 }], // Barbell
+    },
+    {
+      title: "Barbell Squat",
+      slug: "barbell-squat",
+      description: "The king of leg exercises.",
+      steps: [
+        "Rest bar on traps and step back from rack",
+        "Squat down until thighs are parallel to floor",
+        "Drive back up to the starting position",
+      ],
+      primaryMuscles: [MuscleGroups.Quads, MuscleGroups.Glutes],
+      secondaryMuscles: [
+        MuscleGroups.Hamstrings,
+        MuscleGroups.LowerBack,
+        MuscleGroups.Calves,
+      ],
+      equipment: [{ id: 2 }, { id: 6 }], // Barbell, Squat Rack
+    },
+    {
+      title: "Pull-Ups",
+      slug: "pull-ups",
+      description: "The ultimate upper body pull exercise.",
+      steps: [
+        "Grip the bar slightly wider than shoulders",
+        "Pull your body up until your chin is over the bar",
+        "Lower yourself back down with control",
+      ],
+      primaryMuscles: [MuscleGroups.Lats, MuscleGroups.UpperBack],
+      secondaryMuscles: [MuscleGroups.Biceps, MuscleGroups.RearDelts],
+      equipment: [{ id: 17 }], // Dip Station (often includes pull-up bars)
+    },
+    {
+      title: "Russian Twists",
+      slug: "russian-twists",
+      description: "Targets the obliques and core stability.",
+      steps: [
+        "Sit with knees bent and feet slightly off the ground",
+        "Hold a weight and rotate your torso from side to side",
+        "Touch the weight to the floor on each side",
+      ],
+      primaryMuscles: [MuscleGroups.Obliques],
+      secondaryMuscles: [MuscleGroups.Abs],
+      equipment: [{ id: 28 }], // Medicine Ball
     },
   ];
   const arr = [];
-  for (const plan of plans) {
-    let pl = await getRepo(Plan).findOne({ where: { title: plan.title } });
+  for (const ex of exercises) {
+    let pl = await getRepo(Exercise).findOne({ where: { title: ex.title } });
     if (!pl) {
-      pl = await getRepo(Plan).save(plan);
+      pl = await getRepo(Exercise).save(ex);
     }
     arr.push(pl);
   }
