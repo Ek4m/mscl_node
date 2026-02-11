@@ -77,14 +77,17 @@ JSON STRUCTURE:
 {
   "title": "A professional and catchy name for the program",
   "level": "${level}",
+  "description": "Small text explaining workout",
   "days": [
-    {
+    { 
+  "dayIndex":1(representing order of day)
       "title": "Muscle group(s) focus (e.g., 'Chest & Triceps' or 'Full Body')",
-      "moves": [
+      "exercises": [
         {
-          "name": "Exact exercise name",
-          "sets": 0,
-          "reps": "in number type (e.g., '8-10' or '12') ",
+          "orderIndex":1(representing order of exercise)
+          "title": "Exact exercise name(not equipment variation)",
+          "targetSets": (12 ,...recommended value for selected level do not use string just number),
+          "targetReps": "in number type (12,15,10,...recommended value for selected level do not use string just number) ",
           "slug":"exercise slug like (pec-deck-fly, dumbbell-flyes, machine-chest-press etc)"
         }
       ]
@@ -101,30 +104,64 @@ SCIENCE-BASED REQUIREMENTS:
 
 const transformToWorkoutPlan = (body, userId) => {
   const date = new Date();
+  const activeDays = (body.plan || []).filter(
+    (day) => day.exercises && day.exercises.length > 0,
+  );
+
   return {
-    title: body.title || `${userId}-${date.getTime()}`,
-    description: `${body.plan.filter((d) => d.exercises.length > 0).length}-day training split`,
-    days: body.plan
-      .filter((day) => day.exercises.length > 0)
-      .map((day, index) => ({
-        dayIndex: index + 1,
-        title: `Day ${day.dayNumber}`,
-        description: Array.from(
-          new Set(day.exercises.flatMap((ex) => ex.muscle)),
-        ).join(", "),
-        exercises: day.exercises.map((ex, exIndex) => ({
+    title: body.title || `Plan-${userId}-${date.getTime()}`,
+    description: `${activeDays.length}-day training split`,
+    createdBy: userId,
+    days: activeDays.map((day, index) => ({
+      dayIndex: index + 1,
+      title: `Day ${day.dayNumber}`,
+      // Creates a unique list of muscles targeted that day
+      description: Array.from(
+        new Set(day.exercises.flatMap((ex) => ex.muscle || [])),
+      ).join(", "),
+
+      // Map exercises and include the variation relation
+      exercises: day.exercises.map((ex, exIndex) => {
+        const result = {
           orderIndex: exIndex + 1,
-          exercise: { id: ex.id },
           targetSets: parseInt(ex.sets, 10) || 0,
           targetReps: parseInt(ex.reps, 10) || 0,
-        })),
-      })),
-    createdBy: userId,
+          variation: { id: ex.variationId },
+          exercise: {
+            id: ex.id,
+          },
+        };
+        if (!ex.variationId) {
+          delete result.variation;
+        }
+        return result;
+      }),
+    })),
   };
+};
+const flattenExercises = (exercises) => {
+  return exercises.flatMap((exercise) => {
+    const { variations, ...parentData } = exercise;
+    const parentEntry = {
+      ...parentData,
+      variationId: null,
+    };
+
+    const variationEntries = variations.map((variation) => ({
+      ...parentData,
+      id: exercise.id,
+      title: variation.title,
+      description: variation.description,
+      variationId: variation.id,
+    }));
+    if (variations.length === 0) return [parentEntry];
+    return [...variationEntries];
+  });
 };
 
 module.exports = {
   detectObjects,
   generateWorkoutProgram,
   transformToWorkoutPlan,
+  flattenExercises,
 };

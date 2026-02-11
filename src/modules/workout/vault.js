@@ -40,4 +40,10 @@ const MuscleGroups = {
   FullBody: "full-body",
 };
 
-module.exports = { MuscleGroups };
+const GymLevel = {
+  BEGINNER: "beginner",
+  INTERMEDIATE: "intermediate",
+  PRO: "pro",
+};
+
+module.exports = { MuscleGroups, GymLevel };

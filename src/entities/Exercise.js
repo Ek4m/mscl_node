@@ -42,6 +42,12 @@ module.exports = new EntitySchema({
     },
   },
   relations: {
+    variations: {
+      type: "one-to-many",
+      target: "Variation",
+      inverseSide: "exercise", // Points back to the 'exercise' field in VariationSchema
+      cascade: true,
+    },
     equipment: {
       type: "many-to-many",
       target: "Equipment",

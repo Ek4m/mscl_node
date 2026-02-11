@@ -1,11 +1,9 @@
-const { uploadGet, uploadPost, loadToExercises, getPlan } = require("./controller");
-const uploader = require("../../config/multer/init");
+const { loadToExercises, getPlan, seedExercises } = require("./controller");
 
 const router = require("express").Router();
 
-router.get("/upload", uploadGet);
-router.get("/load",loadToExercises)
-router.get("/get-plan",getPlan)
-router.post("/upload", uploader.single("file"), uploadPost);
+router.get("/load", loadToExercises);
+router.get("/loadex", seedExercises);
+router.get("/get-plan", getPlan);
 
 module.exports = router;

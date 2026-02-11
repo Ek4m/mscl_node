@@ -1,4 +1,5 @@
 const { EntitySchema } = require("typeorm");
+const { GymLevel } = require("../modules/workout/vault");
 
 module.exports = new EntitySchema({
   name: "WorkoutPlan",
@@ -14,6 +15,12 @@ module.exports = new EntitySchema({
     title: {
       type: "varchar",
       length: 255,
+    },
+
+    level: {
+      nullable: false,
+      type: "varchar",
+      default: GymLevel.BEGINNER,
     },
 
     description: {

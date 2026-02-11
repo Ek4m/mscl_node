@@ -42,6 +42,13 @@ module.exports = new EntitySchema({
       onDelete: "CASCADE",
     },
 
+    variation: {
+      type: "many-to-one",
+      target: "Variation",
+      joinColumn: { name: "variation_id" },
+      nullable: true,
+    },
+
     exercise: {
       type: "many-to-one",
       target: "Exercise",

@@ -11,6 +11,7 @@ const UserWorkoutExercise = require("../../entities/UserWorkoutExercise");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const UserWorkoutSet = require("../../entities/UserWorkoutSet");
+const Variation = require("../../entities/Variation");
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -25,6 +26,7 @@ const AppDataSource = new DataSource({
     Exercise,
     Equipment,
     ExerciseEquipment,
+    Variation,
     Plan,
     PlanDay,
     PlanDayExercise,
