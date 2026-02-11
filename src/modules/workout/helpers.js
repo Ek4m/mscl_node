@@ -1,5 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const { Index } = require("flexsearch");
 
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash",
@@ -159,9 +160,124 @@ const flattenExercises = (exercises) => {
   });
 };
 
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .replace(/-/g, " ")
+    .replace(/[^a-z0-9 ]/g, "")
+    .trim();
+}
+
+function buildExerciseIndex(exercises) {
+  const index = new Index({
+    tokenize: "forward",
+    resolution: 9,
+    threshold: 2,
+  });
+
+  const store = new Map();
+  let idCounter = 0;
+
+  exercises.forEach((exercise) => {
+    // index main exercise
+    idCounter++;
+    index.add(idCounter, normalize(exercise.title));
+
+    store.set(idCounter, {
+      type: "exercise",
+      exerciseId: exercise.id,
+      variationId: null,
+      title: exercise.title,
+      slug: exercise.slug,
+    });
+
+    // index variations
+    exercise.variations?.forEach((variation) => {
+      idCounter++;
+      index.add(idCounter, normalize(variation.title));
+
+      store.set(idCounter, {
+        type: "variation",
+        exerciseId: exercise.id,
+        variationId: variation.id,
+        title: variation.title,
+      });
+    });
+  });
+
+  return { index, store };
+}
+
+function findBestMatch(title, slug, exercises, index, store) {
+  if (slug) {
+    const normalizedSlug = normalize(slug);
+
+    for (const ex of exercises) {
+      if (ex.slug && normalize(ex.slug) === normalizedSlug) {
+        return {
+          exerciseId: ex.id,
+          variationId: null,
+        };
+      }
+
+      for (const variation of ex.variations ?? []) {
+        if (normalize(variation.title) === normalizedSlug) {
+          return {
+            exerciseId: ex.id,
+            variationId: variation.id,
+          };
+        }
+      }
+    }
+  }
+
+  const searchQuery = normalize(slug || title);
+  const results = index.search(searchQuery, { limit: 3 });
+
+  if (!results.length) return null;
+
+  return store.get(results[0]) ?? null;
+}
+
+function normalizePlan(plan, exercises) {
+  const { index, store } = buildExerciseIndex(exercises);
+
+  return {
+    ...plan,
+    days: plan.days
+      .map((day) => ({
+        ...day,
+        exercises: day.exercises.map((aiEx) => {
+          const match = findBestMatch(
+            aiEx.title,
+            aiEx.slug,
+            exercises,
+            index,
+            store,
+          );
+
+          return {
+            orderIndex: aiEx.orderIndex,
+            targetSets: aiEx.targetSets,
+            targetReps: aiEx.targetReps,
+            exercise: match ? { id: match.exerciseId } : null,
+            variation:
+              match?.variationId != null ? { id: match.variationId } : null,
+          };
+        }),
+      }))
+      .map((day) => ({
+        ...day,
+        exercises: day.exercises.filter((ex) => ex.exercise !== null),
+      }))
+      .filter((day) => day.exercises.length > 0),
+  };
+}
+
 module.exports = {
   detectObjects,
   generateWorkoutProgram,
   transformToWorkoutPlan,
   flattenExercises,
+  normalizePlan,
 };

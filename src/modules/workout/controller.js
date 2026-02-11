@@ -7,12 +7,14 @@ const {
   detectObjects,
   generateWorkoutProgram,
   transformToWorkoutPlan,
+  normalizePlan,
 } = require("./helpers");
 
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const { Document } = require("flexsearch");
 const Exercise = require("../../entities/Exercise");
+const { id } = require("zod/locales");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -31,53 +33,28 @@ const getEquipments = async (req, res) => {
 const generateProgram = async (req, res) => {
   const { equipments, numOfDays, level } = req.body;
   const userId = req.user.id;
-  const response = await generateWorkoutProgram(equipments, level, numOfDays);
+  const response = isDev
+    ? dummyProgram
+    : await generateWorkoutProgram(equipments, level, numOfDays);
   const exercises = await getRepo(Exercise).find({
     select: {
       id: true,
       title: true,
       slug: true,
     },
-  });
-  const docIndex = new Document({
-    document: {
-      id: "id",
-      index: ["title", "slug"],
-      store: true,
+    relations: {
+      variations: true,
     },
-    tokenize: "forward",
-    resolution: 9,
-    threshold: 0,
-    depth: 3,
-  });
-  exercises.forEach((ex) => docIndex.add(ex));
-
-  response.days.forEach((day) => {
-    console.log(`\nDay: ${day.title}`);
-    day.exercises.forEach((aiEx) => {
-      let searchResults = docIndex.search(aiEx.title, {
-        limit: 1,
-        enrich: true,
-      });
-      if (searchResults.length === 0 || searchResults[0].result.length === 0) {
-        searchResults = docIndex.search(aiEx.slug, { limit: 1, enrich: true });
-      }
-      if (searchResults.length > 0 && searchResults[0].result.length > 0) {
-        const match = searchResults[0].result[0];
-        console.log(
-          `✅ MATCHED: "${aiEx.title}" -> DB: "${match.doc.title}" (ID: ${match.id})`,
-        );
-        aiEx.exercise = { id: match.doc.id };
-      } else {
-        console.warn(`❌ NO MATCH FOUND: "${aiEx.title}"`);
-      }
-    });
   });
   console.log(JSON.stringify(response));
+  console.log(" ");
+  const planDto = normalizePlan(response, exercises);
+
   const newPlan = await getRepo(Plan).save({
-    ...response,
+    ...planDto,
     createdBy: { id: userId },
   });
+  console.log(JSON.stringify(newPlan));
   const newPlanRecord = {
     title: newPlan.title,
     user: {
@@ -95,11 +72,25 @@ const generateProgram = async (req, res) => {
         exercise: {
           id: ex.exercise.id,
         },
+        variation: ex.variation ? { id: ex.variation.id } : null,
       })),
     })),
   };
   const customPlan = await getRepo(UserWorkoutPlan).save(newPlanRecord);
-  SuccessResponse(res, customPlan);
+  const plan = await getRepo(UserWorkoutPlan).findOne({
+    where: {
+      id: customPlan.id,
+    },
+    relations: {
+      days: {
+        exercises: {
+          exercise: true,
+          variation: true,
+        },
+      },
+    },
+  });
+  SuccessResponse(res, plan);
 };
 
 const getUsersPlans = async (req, res) => {
@@ -133,7 +124,7 @@ const getPlanById = async (req, res) => {
         },
       },
     });
-    console.log(JSON.stringify(usersProgram))
+    console.log(JSON.stringify(usersProgram));
     SuccessResponse(res, usersProgram);
   }
 };
