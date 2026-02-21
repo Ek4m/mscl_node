@@ -1,8 +1,8 @@
 const { EntitySchema } = require("typeorm");
 
 module.exports = new EntitySchema({
-  name: "UserWorkoutDay",
-  tableName: "user_workout_days",
+  name: "UserWorkoutWeek",
+  tableName: "user_workout_weeks",
 
   columns: {
     id: {
@@ -10,18 +10,20 @@ module.exports = new EntitySchema({
       type: "int",
       generated: true,
     },
-
-    dayIndex: {
+    weekIndex: {
       type: "int",
-      comment: "Order of the day in the plan",
+      comment: "0-based index of the week in the user's plan",
     },
-
     title: {
       type: "varchar",
       length: 100,
       nullable: true,
+      comment: "e.g., 'Intro Week' or 'Deload Week'",
     },
-
+    isCompleted: {
+      type: "boolean",
+      default: false,
+    },
     createdAt: {
       type: "timestamp",
       createDate: true,
@@ -29,19 +31,18 @@ module.exports = new EntitySchema({
   },
 
   relations: {
-    userWorkoutWeek: {
+    userWorkoutPlan: {
       type: "many-to-one",
-      target: "UserWorkoutWeek",
+      target: "UserWorkoutPlan",
       joinColumn: {
-        name: "user_workout_week_id",
+        name: "user_workout_plan_id",
       },
       onDelete: "CASCADE",
     },
-
-    exercises: {
+    days: {
       type: "one-to-many",
-      target: "UserWorkoutExercise",
-      inverseSide: "userWorkoutDay",
+      target: "UserWorkoutDay",
+      inverseSide: "userWorkoutWeek",
       cascade: true,
     },
   },

@@ -2,24 +2,76 @@ const { getRepo } = require("../auth/helpers");
 const { SuccessResponse } = require("../common/helpers");
 
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
-const EQUIPMENTS_SEED = require("../../vault/equipments");
 
 const Variation = require("../../entities/Variation");
 const Exercise = require("../../entities/Exercise");
 const Equipment = require("../../entities/Equipment");
 const { In } = require("typeorm");
 const { MuscleGroups } = require("../workout/vault");
+const Plan = require("../../entities/Plan");
 
 const loadToExercises = async (req, res) => {
-  const arr = [];
-  for (const ex of EQUIPMENTS_SEED) {
-    let pl = await getRepo(Equipment).findOne({ where: { title: ex } });
-    if (!pl) {
-      pl = await getRepo(Equipment).save({ title: ex });
-    }
-    arr.push(pl);
-  }
-  SuccessResponse(res, arr);
+  const mk = {
+    title: "4-Week Strength & Growth",
+    isWeeklyStatic: false,
+    isActive: true,
+    weeks: [
+      {
+        weekNumber: 1,
+        title: "Week 1: Foundations",
+        days: [
+          {
+            orderIndex: 1,
+            title: "Upper Body Push",
+            exercises: [
+              {
+                targetSets: 3,
+                targetReps: "10",
+                exerciseId: 101,
+                orderIndex: 1,
+              },
+              {
+                targetSets: 3,
+                targetReps: "12",
+                exerciseId: 12,
+                orderIndex: 2,
+              },
+            ],
+          },
+          {
+            orderIndex: 2,
+            title: "Lower Body Pull",
+            exercises: [
+              { targetSets: 4, targetReps: "8", exerciseId: 20, orderIndex: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        weekNumber: 2,
+        title: "Week 2: Heavy Load",
+        days: [
+          {
+            orderIndex: 1,
+            title: "Upper Body Push (Heavy)",
+            exercises: [
+              { targetSets: 5, targetReps: "5", exerciseId: 11, orderIndex: 1 },
+            ],
+          },
+          {
+            orderIndex: 2,
+            title: "Lower Body Pull (Heavy)",
+            exercises: [
+              { targetSets: 5, targetReps: "5", exerciseId: 21, orderIndex: 2 },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+  const planRepo = getRepo(Plan);
+  const planResult = await planRepo.save(mk);
+  SuccessResponse(res, planResult);
 };
 
 const getPlan = async (req, res) => {
@@ -422,8 +474,8 @@ const seedExercises = async (req, res) => {
       title: data.title,
       primaryMuscles: data.primaryMuscles,
       secondaryMuscles: data.secondaryMuscles || [],
-      equipment: baseEquipment, 
-      description:data.description,// TypeORM handles the exercise_equipment table
+      equipment: baseEquipment,
+      description: data.description, // TypeORM handles the exercise_equipment table
     });
 
     const savedExercise = await exerciseRepo.save(exercise);
@@ -439,7 +491,7 @@ const seedExercises = async (req, res) => {
         const variation = variationRepo.create({
           title: varData.title,
           exercise: savedExercise,
-          description:varData.description,
+          description: varData.description,
           equipment: variationEquipment, // TypeORM handles the variation_equipment table
         });
 
@@ -447,7 +499,7 @@ const seedExercises = async (req, res) => {
       }
     }
   }
-  SuccessResponse(res,true)
+  SuccessResponse(res, true);
   console.log("Seeding complete!");
 };
 

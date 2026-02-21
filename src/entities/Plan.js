@@ -17,6 +17,12 @@ module.exports = new EntitySchema({
       length: 255,
     },
 
+    thumbnail: {
+      type: "varchar",
+      nullable: true,
+      length: 255,
+    },
+
     level: {
       nullable: false,
       type: "varchar",
@@ -26,6 +32,11 @@ module.exports = new EntitySchema({
     description: {
       type: "text",
       nullable: true,
+    },
+
+    isWeeklyStatic: {
+      type: "boolean",
+      default: false,
     },
 
     daysPerWeek: {
@@ -60,10 +71,9 @@ module.exports = new EntitySchema({
       onDelete: "SET NULL",
     },
 
-    // Days inside this plan
-    days: {
+    weeks: {
       type: "one-to-many",
-      target: "WorkoutPlanDay",
+      target: "WorkoutPlanWeek",
       inverseSide: "workoutPlan",
       cascade: true,
     },

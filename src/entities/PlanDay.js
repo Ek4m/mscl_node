@@ -13,9 +13,12 @@ module.exports = new EntitySchema({
     title: {
       type: "varchar",
       length: 100,
-      comment: "Push / Pull / Legs / Full Body",
     },
 
+    dayIndex: {
+      type: "int",
+      default: 0,
+    },
     description: {
       type: "text",
       nullable: true,
@@ -28,11 +31,11 @@ module.exports = new EntitySchema({
   },
 
   relations: {
-    workoutPlan: {
+    workoutWeek: {
       type: "many-to-one",
-      target: "WorkoutPlan",
+      target: "WorkoutPlanWeek",
       joinColumn: {
-        name: "workout_plan_id",
+        name: "workout_plan_week_id",
       },
       onDelete: "CASCADE",
     },

@@ -96,7 +96,23 @@ const generateProgram = async (req, res) => {
 const getUsersPlans = async (req, res) => {
   const plans = await getRepo(UserWorkoutPlan).find({
     relations: {
-      days: true,
+      weeks: true,
+    },
+  });
+  SuccessResponse(res, plans);
+};
+
+const getPremadePlans = async (req, res) => {
+  const plans = await getRepo(Plan).find({
+    relations: {
+      weeks: {
+        days: {
+          exercises: {
+            exercise: true,
+            variation: true,
+          },
+        },
+      },
     },
   });
   SuccessResponse(res, plans);
@@ -116,16 +132,31 @@ const getPlanById = async (req, res) => {
         },
       },
       relations: {
-        days: {
-          exercises: {
-            exercise: true,
-            variation: true,
+        template: true,
+        weeks: {
+          days: {
+            exercises: {
+              exercise: true,
+              variation: true,
+            },
           },
         },
       },
     });
-    console.log(JSON.stringify(usersProgram));
     SuccessResponse(res, usersProgram);
+  }
+};
+
+const getPlanRegistration = async (req, res) => {
+  const { id } = req.params;
+  const clientId = req.user.id;
+  if (!id) {
+    ErrorResponse(res, "No parameter provided");
+  } else {
+    const activePlan = await getRepo(UserWorkoutPlan).findOne({
+      where: { user: { id: clientId }, template: { id } },
+    });
+    SuccessResponse(res, activePlan);
   }
 };
 
@@ -169,10 +200,69 @@ const createPlan = async (req, res) => {
   SuccessResponse(res, customPlan);
 };
 
+const createPlanFromTemplate = async (req, res) => {
+  const { planId } = req.body;
+  const userId = req.user.id;
+  if (!planId) {
+    ErrorResponse(res, "No parameter provided");
+  } else {
+    const template = await getRepo(Plan).findOne({
+      where: { id: planId },
+      relations: {
+        weeks: {
+          days: {
+            exercises: {
+              exercise: true,
+              variation: true,
+            },
+          },
+        },
+      },
+    });
+    if (!template) {
+      ErrorResponse(res, "Provided planId is not valid. Check again");
+    } else {
+      const newPlanRecord = {
+        title: template.title,
+        user: {
+          id: userId,
+        },
+        template: {
+          id: template.id,
+        },
+        weeks: template.weeks.map((week) => ({
+          weekIndex: week.weekNumber,
+          days: week.days.map((day, dayIndex) => ({
+            dayIndex: dayIndex + 1,
+            exercises: day.exercises.map((ex) => {
+              const result = {
+                targetReps: ex.targetReps,
+                orderIndex: ex.orderIndex,
+                targetSets: ex.targetSets,
+                exercise: {
+                  id: ex.exercise.id,
+                },
+              };
+              if (ex.variation && ex.variation.id) {
+                result.variation = { id: ex.variation.id };
+              }
+              return result;
+            }),
+          })),
+        })),
+      };
+      const customPlan = await getRepo(UserWorkoutPlan).save(newPlanRecord);
+      SuccessResponse(res, customPlan);
+    }
+  }
+};
 module.exports = {
   getEquipments,
   generateProgram,
   getUsersPlans,
+  getPremadePlans,
+  getPlanRegistration,
+  createPlanFromTemplate,
   getPlanById,
   createPlan,
 };

@@ -6,7 +6,10 @@ const {
   generateProgram,
   getUsersPlans,
   getPlanById,
+  getPremadePlans,
   createPlan,
+  getPlanRegistration,
+  createPlanFromTemplate,
 } = require("./controller");
 const { validateSchema } = require("../auth/middlewares");
 const { generateProgramSchema, workoutPlanSchema } = require("./schemas");
@@ -18,8 +21,11 @@ route.post(
   generateProgram,
 );
 route.post("/plan/custom-create", createPlan);
+route.post("/plan/plan-registration", createPlanFromTemplate);
 
 route.get("/plans", getUsersPlans);
+route.get("/premade-plans", getPremadePlans);
 route.get("/user-plan/:id", getPlanById);
+route.get("/plan-registration/:id", getPlanRegistration);
 
 module.exports = route;

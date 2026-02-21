@@ -42,9 +42,9 @@ module.exports = new EntitySchema({
       onDelete: "CASCADE",
     },
 
-    days: {
+    weeks: {
       type: "one-to-many",
-      target: "UserWorkoutDay",
+      target: "UserWorkoutWeek",
       inverseSide: "userWorkoutPlan",
       cascade: true,
     },
