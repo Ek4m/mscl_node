@@ -12,9 +12,7 @@ const {
 
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
-const { Document } = require("flexsearch");
 const Exercise = require("../../entities/Exercise");
-const { id } = require("zod/locales");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -96,6 +94,7 @@ const generateProgram = async (req, res) => {
 const getUsersPlans = async (req, res) => {
   const plans = await getRepo(UserWorkoutPlan).find({
     relations: {
+      template: true,
       weeks: true,
     },
   });
