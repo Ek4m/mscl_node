@@ -23,6 +23,13 @@ module.exports = new EntitySchema({
       length: 255,
     },
 
+    gender: {
+      type: "enum",
+      nullable: false,
+      default: "male",
+      enum: ["male", "female"],
+    },
+
     level: {
       nullable: false,
       type: "varchar",

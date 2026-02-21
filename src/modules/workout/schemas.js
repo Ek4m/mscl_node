@@ -1,9 +1,15 @@
 const { z } = require("zod");
+const { Gender } = require("./vault");
 
 const generateProgramSchema = z.object({
-  equipments: z
-    .array(z.string().min(1, { message: "Equipment name cannot be empty" }))
-    .nonempty({ message: "At least one equipment must be selected" }),
+  level: z.string().min(1, { message: "Level is required" }),
+  gender: z.enum([Gender.FEMALE, Gender.MALE], {
+    error: "Gender must be valid gender",
+  }),
+  weeks: z.number({
+    required_error: "Number of days is required",
+    invalid_type_error: "Number of days must be a number",
+  }),
   level: z.string().min(1, { message: "Level is required" }),
   numOfDays: z
     .number({

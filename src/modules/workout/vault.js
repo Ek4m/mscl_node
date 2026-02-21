@@ -46,4 +46,9 @@ const GymLevel = {
   PRO: "pro",
 };
 
-module.exports = { MuscleGroups, GymLevel };
+const Gender = {
+  MALE: "male",
+  FEMALE: "female",
+};
+
+module.exports = { MuscleGroups, GymLevel, Gender };

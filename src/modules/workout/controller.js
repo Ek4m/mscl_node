@@ -7,12 +7,13 @@ const {
   detectObjects,
   generateWorkoutProgram,
   transformToWorkoutPlan,
-  normalizePlan,
+  normalizeAIPlan,
 } = require("./helpers");
 
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
-const Exercise = require("../../entities/Exercise");
+const Variation = require("../../entities/Variation");
+const { GymLevel } = require("./vault");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -29,30 +30,30 @@ const getEquipments = async (req, res) => {
   }
 };
 const generateProgram = async (req, res) => {
-  const { equipments, numOfDays, level } = req.body;
+  const { numOfDays, level, weeks, gender } = req.body;
   const userId = req.user.id;
+  const variations = await getRepo(Variation).find({
+    where: { level: isDev ? GymLevel.INTERMEDIATE : level },
+    relations: { exercise: true },
+  });
+
+  const exerciseList = variations.map((ex) => ex.title);
   const response = isDev
     ? dummyProgram
-    : await generateWorkoutProgram(equipments, level, numOfDays);
-  const exercises = await getRepo(Exercise).find({
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-    },
-    relations: {
-      variations: true,
-    },
-  });
-  console.log(JSON.stringify(response));
-  console.log(" ");
-  const planDto = normalizePlan(response, exercises);
+    : await generateWorkoutProgram(
+        level,
+        numOfDays,
+        gender,
+        weeks,
+        exerciseList,
+      );
 
+  const planDto = normalizeAIPlan(response, variations);
   const newPlan = await getRepo(Plan).save({
     ...planDto,
+    level,
     createdBy: { id: userId },
   });
-  console.log(JSON.stringify(newPlan));
   const newPlanRecord = {
     title: newPlan.title,
     user: {
@@ -61,16 +62,23 @@ const generateProgram = async (req, res) => {
     template: {
       id: newPlan.id,
     },
-    days: newPlan.days.map((day, index) => ({
-      dayIndex: index + 1,
-      exercises: day.exercises.map((ex, exIndex) => ({
-        targetReps: ex.targetReps,
-        orderIndex: exIndex + 1,
-        targetSets: ex.targetSets,
-        exercise: {
-          id: ex.exercise.id,
-        },
-        variation: ex.variation ? { id: ex.variation.id } : null,
+    weeks: newPlan.weeks.map((w) => ({
+      ...w,
+      weekIndex: w.weekNumber,
+      days: w.days.map((day, index) => ({
+        dayIndex: index + 1,
+        title: `Day ${index + 1}`,
+        exercises: day.exercises.map((ex, exIndex) => {
+          return {
+            targetReps: ex.targetReps,
+            orderIndex: exIndex + 1,
+            targetSets: ex.targetSets,
+            exercise: {
+              id: ex.exercise.id,
+            },
+            variation: ex.variation ? { id: ex.variation.id } : null,
+          };
+        }),
       })),
     })),
   };
@@ -79,11 +87,14 @@ const generateProgram = async (req, res) => {
     where: {
       id: customPlan.id,
     },
+    template: newPlan,
     relations: {
-      days: {
-        exercises: {
-          exercise: true,
-          variation: true,
+      weeks: {
+        days: {
+          exercises: {
+            exercise: true,
+            variation: true,
+          },
         },
       },
     },

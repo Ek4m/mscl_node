@@ -66,40 +66,24 @@ Now analyze the provided photos and output the JSON.`;
   return sendToAI(prompt, files);
 }
 
-const generateWorkoutProgram = async (equipments, level, days) => {
-  const prompt = `You are an experienced, science-based gym trainer. 
-Your task is to create a structured workout program based on the following user constraints:
-- Level: ${level}
-- Frequency: ${days} days per week
-- Available Equipment: ${equipments.join(", ")}
-OUTPUT INSTRUCTIONS:
-Return ONLY a raw JSON response. No prose, no markdown code blocks, no explanations, and no conversational filler. The response must be valid JSON and nothing else. Not inside array just raw json object
-JSON STRUCTURE:
+const generateWorkoutProgram = async (
+  level,
+  days,
+  gender,
+  weeks,
+  exerciseList,
+) => {
+  const prompt = `You are a science-based gym trainer. Create a structured workout program based on:
+Level: ${level}, Weeks: ${weeks}, Frequency: ${days}/week, Gender: ${gender}, Exercises: ${exerciseList.join(",")}
+Return ONLY raw JSON:
 {
-  "title": "A professional and catchy name for the program",
-  "level": "${level}",
-  "description": "Small text explaining workout",
-  "days": [
-    { 
-  "dayIndex":1(representing order of day)
-      "title": "Muscle group(s) focus (e.g., 'Chest & Triceps' or 'Full Body')",
-      "exercises": [
-        {
-          "orderIndex":1(representing order of exercise)
-          "title": "Exact exercise name(not equipment variation)",
-          "targetSets": (12 ,...recommended value for selected level do not use string just number),
-          "targetReps": "in number type (12,15,10,...recommended value for selected level do not use string just number) ",
-          "slug":"exercise slug like (pec-deck-fly, dumbbell-flyes, machine-chest-press etc)"
-        }
-      ]
-    }
+  "title": "...",
+  "description": "...",
+  "weeks":[
+    {"weekNumber":1,"days":[{"dayIndex":1,"exercises":[{"orderIndex":1,"title":"exactly same that was provided","targetSets":12(only number),"targetReps":12(only single number, no string no amrap, no "8-12" just number)}]}]}
   ]
 }
-
-SCIENCE-BASED REQUIREMENTS:
-1. Ensure recovery time between muscle groups is optimized for a ${days}-day split.
-2. Select movements that utilize only the available equipment listed.
-3. For ${level} level, ensure appropriate volume (sets/reps) and exercise complexity.`;
+Ensure recovery and proper volume and num of exercises for ${level} with ${days}-day split.`;
   return sendToAI(prompt);
 };
 
@@ -160,117 +144,39 @@ const flattenExercises = (exercises) => {
   });
 };
 
-function normalize(str) {
-  return str
-    .toLowerCase()
-    .replace(/-/g, " ")
-    .replace(/[^a-z0-9 ]/g, "")
-    .trim();
-}
+const normalize = (str) => {
+  if (!str) return "";
+  return str.toLowerCase().trim();
+};
 
-function buildExerciseIndex(exercises) {
-  const index = new Index({
-    tokenize: "forward",
-    resolution: 9,
-    threshold: 2,
-  });
-
-  const store = new Map();
-  let idCounter = 0;
-
-  exercises.forEach((exercise) => {
-    // index main exercise
-    idCounter++;
-    index.add(idCounter, normalize(exercise.title));
-
-    store.set(idCounter, {
-      type: "exercise",
-      exerciseId: exercise.id,
-      variationId: null,
-      title: exercise.title,
-      slug: exercise.slug,
-    });
-
-    // index variations
-    exercise.variations?.forEach((variation) => {
-      idCounter++;
-      index.add(idCounter, normalize(variation.title));
-
-      store.set(idCounter, {
-        type: "variation",
-        exerciseId: exercise.id,
-        variationId: variation.id,
-        title: variation.title,
-      });
+function normalizeAIPlan(plan, variations) {
+  const variationLookup = new Map();
+  variations.forEach((v) => {
+    variationLookup.set(normalize(v.title), {
+      variationId: v.id,
+      exerciseId: v.exercise.id,
     });
   });
-
-  return { index, store };
-}
-
-function findBestMatch(title, slug, exercises, index, store) {
-  if (slug) {
-    const normalizedSlug = normalize(slug);
-
-    for (const ex of exercises) {
-      if (ex.slug && normalize(ex.slug) === normalizedSlug) {
-        return {
-          exerciseId: ex.id,
-          variationId: null,
-        };
-      }
-
-      for (const variation of ex.variations ?? []) {
-        if (normalize(variation.title) === normalizedSlug) {
-          return {
-            exerciseId: ex.id,
-            variationId: variation.id,
-          };
-        }
-      }
-    }
-  }
-
-  const searchQuery = normalize(slug || title);
-  const results = index.search(searchQuery, { limit: 3 });
-
-  if (!results.length) return null;
-
-  return store.get(results[0]) ?? null;
-}
-
-function normalizePlan(plan, exercises) {
-  const { index, store } = buildExerciseIndex(exercises);
-
   return {
     ...plan,
-    days: plan.days
-      .map((day) => ({
+    weeks: plan.weeks.map((week) => ({
+      ...week,
+      days: week.days.map((day, dayInd) => ({
         ...day,
+        title: `Day ${dayInd + 1}`,
         exercises: day.exercises.map((aiEx) => {
-          const match = findBestMatch(
-            aiEx.title,
-            aiEx.slug,
-            exercises,
-            index,
-            store,
-          );
-
+          console.log(normalize(aiEx.title));
+          const match = variationLookup.get(normalize(aiEx.title));
           return {
             orderIndex: aiEx.orderIndex,
             targetSets: aiEx.targetSets,
             targetReps: aiEx.targetReps,
             exercise: match ? { id: match.exerciseId } : null,
-            variation:
-              match?.variationId != null ? { id: match.variationId } : null,
+            variation: match ? { id: match.variationId } : null,
           };
         }),
-      }))
-      .map((day) => ({
-        ...day,
-        exercises: day.exercises.filter((ex) => ex.exercise !== null),
-      }))
-      .filter((day) => day.exercises.length > 0),
+      })),
+    })),
   };
 }
 
@@ -279,5 +185,5 @@ module.exports = {
   generateWorkoutProgram,
   transformToWorkoutPlan,
   flattenExercises,
-  normalizePlan,
+  normalizeAIPlan,
 };
