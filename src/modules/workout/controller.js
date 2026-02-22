@@ -6,14 +6,13 @@ const { isDev } = require("../../helpers");
 const {
   detectObjects,
   generateWorkoutProgram,
-  transformToWorkoutPlan,
   normalizeAIPlan,
 } = require("./helpers");
 
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const Variation = require("../../entities/Variation");
-const { GymLevel } = require("./vault");
+const { GymLevel, CreationType } = require("./vault");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -52,6 +51,7 @@ const generateProgram = async (req, res) => {
   const newPlan = await getRepo(Plan).save({
     ...planDto,
     level,
+    creationType: CreationType.AI_GENERATED,
     createdBy: { id: userId },
   });
   const newPlanRecord = {
@@ -67,7 +67,6 @@ const generateProgram = async (req, res) => {
       weekIndex: w.weekNumber,
       days: w.days.map((day, index) => ({
         dayIndex: index + 1,
-        title: `Day ${index + 1}`,
         exercises: day.exercises.map((ex, exIndex) => {
           return {
             targetReps: ex.targetReps,
@@ -173,14 +172,42 @@ const getPlanRegistration = async (req, res) => {
 const createPlan = async (req, res) => {
   const { plan, title } = req.body;
   const userId = req.user.id;
-  if (!plan || !Array.isArray(plan) || !plan.length)
-    ErrorResponse(res, "Provided plan credentials are not valid. Check again");
-  const planRepo = getRepo(Plan);
-  const mappedBody = transformToWorkoutPlan({ plan, title }, userId);
-
-  let newPlan = await planRepo.save(mappedBody);
-  console.log(JSON.stringify(newPlan));
-  const newPlanRecord = {
+  const mappedPlan = {
+    title,
+    createdBy: {
+      id: userId,
+    },
+    creationType: CreationType.CUSTOM_CREATED,
+    weeks: plan
+      .map((week) => {
+        return {
+          ...week,
+          days: week.days
+            .map((day) => {
+              return {
+                dayIndex: day.dayIndex,
+                exercises: day.exercises.map((ex, index) => {
+                  return {
+                    orderIndex: index,
+                    targetReps: Number(ex.reps) || 12,
+                    targetSets: Number(ex.sets) || 3,
+                    exercise: {
+                      id: ex.id,
+                    },
+                    variation: {
+                      id: ex.variationId,
+                    },
+                  };
+                }),
+              };
+            })
+            .filter((day) => Boolean(day.exercises.length)),
+        };
+      })
+      .filter((day) => Boolean(day.days.length)),
+  };
+  const newPlan = await getRepo(Plan).save(mappedPlan);
+  const newUserPlan = {
     title: newPlan.title,
     user: {
       id: userId,
@@ -188,25 +215,28 @@ const createPlan = async (req, res) => {
     template: {
       id: newPlan.id,
     },
-    days: newPlan.days.map((day, index) => ({
-      dayIndex: index + 1,
-      exercises: day.exercises.map((ex, exIndex) => {
-        const result = {
-          targetReps: ex.targetReps,
-          orderIndex: exIndex + 1,
-          targetSets: ex.targetSets,
-          exercise: {
-            id: ex.exercise.id,
-          },
-        };
-        if (ex.variation && ex.variation.id) {
-          result.variation = { id: ex.variation.id };
-        }
-        return result;
-      }),
+    weeks: newPlan.weeks.map((week) => ({
+      weekIndex: week.weekNumber,
+      days: week.days.map((day, dayIndex) => ({
+        dayIndex: dayIndex + 1,
+        exercises: day.exercises.map((ex) => {
+          const result = {
+            targetReps: ex.targetReps,
+            orderIndex: ex.orderIndex,
+            targetSets: ex.targetSets,
+            exercise: {
+              id: ex.exercise.id,
+            },
+          };
+          if (ex.variation && ex.variation.id) {
+            result.variation = { id: ex.variation.id };
+          }
+          return result;
+        }),
+      })),
     })),
   };
-  const customPlan = await getRepo(UserWorkoutPlan).save(newPlanRecord);
+  const customPlan = await getRepo(UserWorkoutPlan).save(newUserPlan);
   SuccessResponse(res, customPlan);
 };
 

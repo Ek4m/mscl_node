@@ -16,12 +16,6 @@ module.exports = new EntitySchema({
       comment: "Order of the day in the plan",
     },
 
-    title: {
-      type: "varchar",
-      length: 100,
-      nullable: true,
-    },
-
     createdAt: {
       type: "timestamp",
       createDate: true,

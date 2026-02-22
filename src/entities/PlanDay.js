@@ -10,10 +10,6 @@ module.exports = new EntitySchema({
       type: "int",
       generated: true,
     },
-    title: {
-      type: "varchar",
-      length: 100,
-    },
 
     dayIndex: {
       type: "int",

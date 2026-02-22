@@ -163,7 +163,6 @@ function normalizeAIPlan(plan, variations) {
       ...week,
       days: week.days.map((day, dayInd) => ({
         ...day,
-        title: `Day ${dayInd + 1}`,
         exercises: day.exercises.map((aiEx) => {
           console.log(normalize(aiEx.title));
           const match = variationLookup.get(normalize(aiEx.title));

@@ -51,4 +51,10 @@ const Gender = {
   FEMALE: "female",
 };
 
-module.exports = { MuscleGroups, GymLevel, Gender };
+const CreationType = {
+  PROFESSIONAL: 1,
+  AI_GENERATED: 2,
+  CUSTOM_CREATED: 3,
+};
+
+module.exports = { MuscleGroups, GymLevel, Gender, CreationType };
