@@ -1,4 +1,5 @@
 const { EntitySchema } = require("typeorm");
+const { PlanStatus } = require("../modules/workout/vault");
 
 module.exports = new EntitySchema({
   name: "UserWorkoutPlan",
@@ -21,9 +22,10 @@ module.exports = new EntitySchema({
       createDate: true,
     },
 
-    isActive: {
-      type: "boolean",
-      default: false,
+    status: {
+      default: PlanStatus.ACTIVE,
+      type: "enum",
+      enum: [PlanStatus.ACTIVE, PlanStatus.ARCHIVED, PlanStatus.INACTIVE],
     },
 
     updatedAt: {

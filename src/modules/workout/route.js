@@ -10,9 +10,10 @@ const {
   createPlan,
   getPlanRegistration,
   createPlanFromTemplate,
+  updateUserPlanStatus,
 } = require("./controller");
 const { validateSchema } = require("../auth/middlewares");
-const { generateProgramSchema, workoutPlanSchema } = require("./schemas");
+const { generateProgramSchema } = require("./schemas");
 
 route.post("/detect", uploader.array("images", 6), getEquipments);
 route.post(
@@ -22,6 +23,7 @@ route.post(
 );
 route.post("/plan/custom-create", createPlan);
 route.post("/plan/plan-registration", createPlanFromTemplate);
+route.post("/plan/update-status", updateUserPlanStatus);
 
 route.get("/plans", getUsersPlans);
 route.get("/premade-plans", getPremadePlans);

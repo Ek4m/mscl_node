@@ -57,4 +57,10 @@ const CreationType = {
   CUSTOM_CREATED: 3,
 };
 
-module.exports = { MuscleGroups, GymLevel, Gender, CreationType };
+const PlanStatus = {
+  INACTIVE: "INACTIVE",
+  ACTIVE: "ACTIVE",
+  ARCHIVED: "ARCHIVED",
+};
+
+module.exports = { MuscleGroups, GymLevel, Gender, CreationType, PlanStatus };

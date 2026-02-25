@@ -12,7 +12,8 @@ const {
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const Variation = require("../../entities/Variation");
-const { GymLevel, CreationType } = require("./vault");
+const { GymLevel, CreationType, PlanStatus } = require("./vault");
+const { Not } = require("typeorm");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -107,6 +108,9 @@ const getUsersPlans = async (req, res) => {
       template: true,
       weeks: true,
     },
+    where: {
+      status: Not(PlanStatus.ARCHIVED),
+    },
   });
   SuccessResponse(res, plans);
 };
@@ -139,6 +143,7 @@ const getPlanById = async (req, res) => {
         user: {
           id: clientId,
         },
+        status: Not(PlanStatus.ARCHIVED),
       },
       relations: {
         template: true,
@@ -296,6 +301,24 @@ const createPlanFromTemplate = async (req, res) => {
     }
   }
 };
+
+const updateUserPlanStatus = async (req, res) => {
+  const { userPlanId, status } = req.body;
+  if (!userPlanId || !status) {
+    ErrorResponse(res, "Invalid parameters provided");
+  } else {
+    const planRepo = getRepo(UserWorkoutPlan);
+    const plan = await planRepo.findOne({
+      where: { id: userPlanId, status: Not(PlanStatus.ARCHIVED) },
+      select: ["id"],
+    });
+    if (!plan) ErrorResponse(res, "Plan was not found");
+    else {
+      await planRepo.update({ id: plan.id }, { status });
+      SuccessResponse(res, true);
+    }
+  }
+};
 module.exports = {
   getEquipments,
   generateProgram,
@@ -303,6 +326,7 @@ module.exports = {
   getPremadePlans,
   getPlanRegistration,
   createPlanFromTemplate,
+  updateUserPlanStatus,
   getPlanById,
   createPlan,
 };
