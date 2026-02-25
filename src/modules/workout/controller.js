@@ -127,6 +127,7 @@ const getPremadePlans = async (req, res) => {
         },
       },
     },
+    where: { creationType: CreationType.PROFESSIONAL },
   });
   SuccessResponse(res, plans);
 };
@@ -168,7 +169,11 @@ const getPlanRegistration = async (req, res) => {
     ErrorResponse(res, "No parameter provided");
   } else {
     const activePlan = await getRepo(UserWorkoutPlan).findOne({
-      where: { user: { id: clientId }, template: { id } },
+      where: {
+        user: { id: clientId },
+        template: { id },
+        status: Not(PlanStatus.ARCHIVED),
+      },
     });
     SuccessResponse(res, activePlan);
   }
