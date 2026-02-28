@@ -19,6 +19,10 @@ module.exports = new EntitySchema({
       type: "text",
       nullable: true,
     },
+    thumbnail: {
+      type: "varchar",
+      nullable: true,
+    },
     level: {
       type: "varchar",
       nullable: true,
