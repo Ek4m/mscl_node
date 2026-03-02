@@ -14,6 +14,8 @@ const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const Variation = require("../../entities/Variation");
 const { GymLevel, CreationType, PlanStatus } = require("./vault");
 const { Not } = require("typeorm");
+const UserWorkoutDay = require("../../entities/UserWorkoutDay");
+const UserWorkoutExercise = require("../../entities/UserWorkoutExercise");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -324,12 +326,42 @@ const updateUserPlanStatus = async (req, res) => {
     }
   }
 };
+
+const editUserPlanDay = async (req, res) => {
+  const { dayId, exercises } = req.body;
+  console.log(JSON.stringify(exercises))
+  const dayRepo = getRepo(UserWorkoutDay);
+  const day = await dayRepo.findOne({
+    where: { id: dayId },
+    relations: { exercises: true },
+  });
+  if (!day) ErrorResponse(res, ["Required data was not found"]);
+  day.exercises = exercises.map((ex, index) => {
+    const resultEx = {
+      targetReps: ex.targetReps,
+      targetSets: ex.targetSets,
+      orderIndex: index + 1,
+      exercise: {
+        id: ex.exerciseId,
+      },
+    };
+    if (ex.variationId) {
+      resultEx.variation = { id: ex.variationId };
+    }
+    return resultEx;
+  });
+  console.log(JSON.stringify(day));
+  await dayRepo.save(day);
+  SuccessResponse(res, day);
+};
+
 module.exports = {
   getEquipments,
   generateProgram,
   getUsersPlans,
   getPremadePlans,
   getPlanRegistration,
+  editUserPlanDay,
   createPlanFromTemplate,
   updateUserPlanStatus,
   getPlanById,

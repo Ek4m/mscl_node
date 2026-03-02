@@ -9,7 +9,7 @@ const SuccessResponse = (res, data, statusCode = 200) => {
 const ErrorResponse = (res, messages, statusCode = 500) => {
   return res.status(statusCode).json({
     status: statusCode,
-    data:null,
+    data: null,
     messages: messages
       ? Array.isArray(messages)
         ? messages
