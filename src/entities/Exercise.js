@@ -3,7 +3,7 @@ const { GymLevel } = require("../modules/workout/vault");
 
 module.exports = new EntitySchema({
   name: "Exercise",
-  tableName: "exercises",
+  tableName: "exercise_groups",
   columns: {
     id: {
       primary: true,
@@ -14,28 +14,8 @@ module.exports = new EntitySchema({
       type: "varchar",
       length: 255,
     },
-    steps: {
-      type: "simple-array",
-      nullable: true,
-    },
-    level: {
-      type: "varchar",
-      nullable: true,
-      default: GymLevel.BEGINNER,
-    },
     description: {
       type: "text",
-      nullable: true,
-    },
-    primaryMuscles: {
-      type: "simple-array",
-    },
-    secondaryMuscles: {
-      type: "simple-array",
-      nullable: true,
-    },
-    slug: {
-      type: "varchar",
       nullable: true,
     },
     createdAt: {

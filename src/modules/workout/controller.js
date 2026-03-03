@@ -15,7 +15,6 @@ const Variation = require("../../entities/Variation");
 const { GymLevel, CreationType, PlanStatus } = require("./vault");
 const { Not } = require("typeorm");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
-const UserWorkoutExercise = require("../../entities/UserWorkoutExercise");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -36,7 +35,6 @@ const generateProgram = async (req, res) => {
   const userId = req.user.id;
   const variations = await getRepo(Variation).find({
     where: { level: isDev ? GymLevel.INTERMEDIATE : level },
-    relations: { exercise: true },
   });
 
   const exerciseList = variations.map((ex) => ex.title);
@@ -75,9 +73,6 @@ const generateProgram = async (req, res) => {
             targetReps: ex.targetReps,
             orderIndex: exIndex + 1,
             targetSets: ex.targetSets,
-            exercise: {
-              id: ex.exercise.id,
-            },
             variation: ex.variation ? { id: ex.variation.id } : null,
           };
         }),
@@ -94,7 +89,6 @@ const generateProgram = async (req, res) => {
       weeks: {
         days: {
           exercises: {
-            exercise: true,
             variation: true,
           },
         },
@@ -123,7 +117,6 @@ const getPremadePlans = async (req, res) => {
       weeks: {
         days: {
           exercises: {
-            exercise: true,
             variation: true,
           },
         },
@@ -153,7 +146,6 @@ const getPlanById = async (req, res) => {
         weeks: {
           days: {
             exercises: {
-              exercise: true,
               variation: true,
             },
           },
@@ -203,11 +195,8 @@ const createPlan = async (req, res) => {
                     orderIndex: index,
                     targetReps: Number(ex.reps) || 12,
                     targetSets: Number(ex.sets) || 3,
-                    exercise: {
-                      id: ex.id,
-                    },
                     variation: {
-                      id: ex.variationId,
+                      id: ex.id,
                     },
                   };
                 }),
@@ -236,9 +225,6 @@ const createPlan = async (req, res) => {
             targetReps: ex.targetReps,
             orderIndex: ex.orderIndex,
             targetSets: ex.targetSets,
-            exercise: {
-              id: ex.exercise.id,
-            },
           };
           if (ex.variation && ex.variation.id) {
             result.variation = { id: ex.variation.id };
@@ -264,7 +250,6 @@ const createPlanFromTemplate = async (req, res) => {
         weeks: {
           days: {
             exercises: {
-              exercise: true,
               variation: true,
             },
           },
@@ -291,9 +276,6 @@ const createPlanFromTemplate = async (req, res) => {
                 targetReps: ex.targetReps,
                 orderIndex: ex.orderIndex,
                 targetSets: ex.targetSets,
-                exercise: {
-                  id: ex.exercise.id,
-                },
               };
               if (ex.variation && ex.variation.id) {
                 result.variation = { id: ex.variation.id };
@@ -329,7 +311,6 @@ const updateUserPlanStatus = async (req, res) => {
 
 const editUserPlanDay = async (req, res) => {
   const { dayId, exercises } = req.body;
-  console.log(JSON.stringify(exercises))
   const dayRepo = getRepo(UserWorkoutDay);
   const day = await dayRepo.findOne({
     where: { id: dayId },
@@ -341,16 +322,12 @@ const editUserPlanDay = async (req, res) => {
       targetReps: ex.targetReps,
       targetSets: ex.targetSets,
       orderIndex: index + 1,
-      exercise: {
-        id: ex.exerciseId,
-      },
     };
     if (ex.variationId) {
       resultEx.variation = { id: ex.variationId };
     }
     return resultEx;
   });
-  console.log(JSON.stringify(day));
   await dayRepo.save(day);
   SuccessResponse(res, day);
 };

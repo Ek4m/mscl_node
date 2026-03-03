@@ -154,7 +154,6 @@ function normalizeAIPlan(plan, variations) {
   variations.forEach((v) => {
     variationLookup.set(normalize(v.title), {
       variationId: v.id,
-      exerciseId: v.exercise.id,
     });
   });
   return {
@@ -164,13 +163,11 @@ function normalizeAIPlan(plan, variations) {
       days: week.days.map((day, dayInd) => ({
         ...day,
         exercises: day.exercises.map((aiEx) => {
-          console.log(normalize(aiEx.title));
           const match = variationLookup.get(normalize(aiEx.title));
           return {
             orderIndex: aiEx.orderIndex,
             targetSets: aiEx.targetSets,
             targetReps: aiEx.targetReps,
-            exercise: match ? { id: match.exerciseId } : null,
             variation: match ? { id: match.variationId } : null,
           };
         }),

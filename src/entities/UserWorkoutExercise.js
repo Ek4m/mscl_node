@@ -47,22 +47,7 @@ module.exports = new EntitySchema({
       target: "Variation",
       joinColumn: { name: "variation_id" },
       nullable: true,
-    },
-
-    exercise: {
-      type: "many-to-one",
-      target: "Exercise",
-      joinColumn: {
-        name: "exercise_id",
-      },
       onDelete: "RESTRICT",
-    },
-
-    sets: {
-      type: "one-to-many",
-      target: "UserWorkoutSet",
-      inverseSide: "userWorkoutExercise",
-      cascade: true,
     },
   },
 });

@@ -19,8 +19,20 @@ module.exports = new EntitySchema({
       type: "text",
       nullable: true,
     },
+    steps: {
+      type: "simple-array",
+      nullable: true,
+    },
     thumbnail: {
       type: "varchar",
+      nullable: true,
+    },
+    primaryMuscles: {
+      type: "simple-array",
+      nullable: true,
+    },
+    secondaryMuscles: {
+      type: "simple-array",
       nullable: true,
     },
     level: {
