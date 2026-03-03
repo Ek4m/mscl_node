@@ -322,10 +322,10 @@ const editUserPlanDay = async (req, res) => {
       targetReps: ex.targetReps,
       targetSets: ex.targetSets,
       orderIndex: index + 1,
+      variation: {
+        id: ex.exerciseId,
+      },
     };
-    if (ex.variationId) {
-      resultEx.variation = { id: ex.variationId };
-    }
     return resultEx;
   });
   await dayRepo.save(day);
