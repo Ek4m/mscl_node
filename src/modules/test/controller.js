@@ -17,7 +17,7 @@ const loadToExercises = async (req, res) => {
     isActive: true,
     weeks: [
       {
-        weekNumber: 1,
+        orderIndex: 1,
         title: "Week 1: Foundations",
         days: [
           {
@@ -48,7 +48,7 @@ const loadToExercises = async (req, res) => {
         ],
       },
       {
-        weekNumber: 2,
+        orderIndex: 2,
         title: "Week 2: Heavy Load",
         days: [
           {

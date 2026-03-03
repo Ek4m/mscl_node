@@ -65,9 +65,9 @@ const generateProgram = async (req, res) => {
     },
     weeks: newPlan.weeks.map((w) => ({
       ...w,
-      weekIndex: w.weekNumber,
+      orderIndex: w.orderIndex,
       days: w.days.map((day, index) => ({
-        dayIndex: index + 1,
+        orderIndex: index + 1,
         exercises: day.exercises.map((ex, exIndex) => {
           return {
             targetReps: ex.targetReps,
@@ -189,7 +189,7 @@ const createPlan = async (req, res) => {
           days: week.days
             .map((day) => {
               return {
-                dayIndex: day.dayIndex,
+                orderIndex: day.orderIndex,
                 exercises: day.exercises.map((ex, index) => {
                   return {
                     orderIndex: index,
@@ -217,9 +217,9 @@ const createPlan = async (req, res) => {
       id: newPlan.id,
     },
     weeks: newPlan.weeks.map((week) => ({
-      weekIndex: week.weekNumber,
-      days: week.days.map((day, dayIndex) => ({
-        dayIndex: dayIndex + 1,
+      orderIndex: week.orderIndex,
+      days: week.days.map((day, orderIndex) => ({
+        orderIndex: orderIndex + 1,
         exercises: day.exercises.map((ex) => {
           const result = {
             targetReps: ex.targetReps,
@@ -268,9 +268,9 @@ const createPlanFromTemplate = async (req, res) => {
           id: template.id,
         },
         weeks: template.weeks.map((week) => ({
-          weekIndex: week.weekNumber,
-          days: week.days.map((day, dayIndex) => ({
-            dayIndex: dayIndex + 1,
+          orderIndex: week.orderIndex,
+          days: week.days.map((day, orderIndex) => ({
+            orderIndex: orderIndex + 1,
             exercises: day.exercises.map((ex) => {
               const result = {
                 targetReps: ex.targetReps,

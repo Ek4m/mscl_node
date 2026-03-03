@@ -80,7 +80,7 @@ Return ONLY raw JSON:
   "title": "...",
   "description": "...",
   "weeks":[
-    {"weekNumber":1,"days":[{"dayIndex":1,"exercises":[{"orderIndex":1,"title":"exactly same that was provided","targetSets":12(only number),"targetReps":12(only single number, no string no amrap, no "8-12" just number)}]}]}
+    {"orderIndex":1,"days":[{"orderIndex":1,"exercises":[{"orderIndex":1,"title":"exactly same that was provided","targetSets":12(only number),"targetReps":12(only single number, no string no amrap, no "8-12" just number)}]}]}
   ]
 }
 Ensure recovery and proper volume and num of exercises for ${level} with ${days}-day split.`;
@@ -98,7 +98,7 @@ const transformToWorkoutPlan = (body, userId) => {
     description: `${activeDays.length}-day training split`,
     createdBy: userId,
     days: activeDays.map((day, index) => ({
-      dayIndex: index + 1,
+      orderIndex: index + 1,
       title: `Day ${day.dayNumber}`,
       // Creates a unique list of muscles targeted that day
       description: Array.from(

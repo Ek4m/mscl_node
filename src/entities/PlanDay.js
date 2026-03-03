@@ -11,7 +11,7 @@ module.exports = new EntitySchema({
       generated: true,
     },
 
-    dayIndex: {
+    orderIndex: {
       type: "int",
       default: 0,
     },

@@ -10,7 +10,7 @@ module.exports = new EntitySchema({
       type: "int",
       generated: true,
     },
-    weekIndex: {
+    orderIndex: {
       type: "int",
       comment: "0-based index of the week in the user's plan",
     },

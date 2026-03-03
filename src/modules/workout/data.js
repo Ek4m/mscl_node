@@ -4,10 +4,10 @@ const dummyProgram = {
     "A 4-week program designed for intermediate lifters focusing on strength and hypertrophy. The program incorporates a 3-day split, emphasizing compound movements and targeted accessory exercises to promote balanced muscle development and overall strength gains. Ensure proper warm-up and cool-down routines before and after each workout. Adjust weight to maintain proper form and target rep ranges.",
   weeks: [
     {
-      weekNumber: 1,
+      orderIndex: 1,
       days: [
         {
-          dayIndex: 1,
+          orderIndex: 1,
           exercises: [
             {
               orderIndex: 1,
@@ -42,7 +42,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 2,
+          orderIndex: 2,
           exercises: [
             {
               orderIndex: 1,
@@ -77,7 +77,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 3,
+          orderIndex: 3,
           exercises: [
             {
               orderIndex: 1,
@@ -114,10 +114,10 @@ const dummyProgram = {
       ],
     },
     {
-      weekNumber: 2,
+      orderIndex: 2,
       days: [
         {
-          dayIndex: 1,
+          orderIndex: 1,
           exercises: [
             {
               orderIndex: 1,
@@ -152,7 +152,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 2,
+          orderIndex: 2,
           exercises: [
             {
               orderIndex: 1,
@@ -187,7 +187,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 3,
+          orderIndex: 3,
           exercises: [
             {
               orderIndex: 1,
@@ -224,10 +224,10 @@ const dummyProgram = {
       ],
     },
     {
-      weekNumber: 3,
+      orderIndex: 3,
       days: [
         {
-          dayIndex: 1,
+          orderIndex: 1,
           exercises: [
             {
               orderIndex: 1,
@@ -262,7 +262,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 2,
+          orderIndex: 2,
           exercises: [
             {
               orderIndex: 1,
@@ -297,7 +297,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 3,
+          orderIndex: 3,
           exercises: [
             {
               orderIndex: 1,
@@ -334,10 +334,10 @@ const dummyProgram = {
       ],
     },
     {
-      weekNumber: 4,
+      orderIndex: 4,
       days: [
         {
-          dayIndex: 1,
+          orderIndex: 1,
           exercises: [
             {
               orderIndex: 1,
@@ -372,7 +372,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 2,
+          orderIndex: 2,
           exercises: [
             {
               orderIndex: 1,
@@ -407,7 +407,7 @@ const dummyProgram = {
           ],
         },
         {
-          dayIndex: 3,
+          orderIndex: 3,
           exercises: [
             {
               orderIndex: 1,
