@@ -1,5 +1,5 @@
 const dummyProgram = {
-  title: "Intermediate Strength & Hypertrophy Program (4 Weeks)",
+  title: "Intermediate Strength Program",
   description:
     "A 4-week program designed for intermediate lifters focusing on strength and hypertrophy. The program incorporates a 3-day split, emphasizing compound movements and targeted accessory exercises to promote balanced muscle development and overall strength gains. Ensure proper warm-up and cool-down routines before and after each workout. Adjust weight to maintain proper form and target rep ranges.",
   weeks: [
