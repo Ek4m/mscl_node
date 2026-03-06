@@ -12,6 +12,7 @@ const UserWorkoutExercise = require("../../entities/UserWorkoutExercise");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
 const UserWorkoutWeek = require("../../entities/UserWorkoutWeek");
+const ExerciseType = require("../../entities/ExerciseType");
 const UserWorkoutSet = require("../../entities/UserWorkoutSet");
 const Variation = require("../../entities/Variation");
 
@@ -26,6 +27,7 @@ const AppDataSource = new DataSource({
   entities: [
     User,
     Exercise,
+    ExerciseType,
     Equipment,
     ExerciseEquipment,
     Variation,

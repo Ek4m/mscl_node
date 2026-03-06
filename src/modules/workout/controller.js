@@ -15,6 +15,7 @@ const Variation = require("../../entities/Variation");
 const { GymLevel, CreationType, PlanStatus } = require("./vault");
 const { Not } = require("typeorm");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
+const Exercise = require("../../entities/Exercise");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -31,12 +32,19 @@ const getEquipments = async (req, res) => {
   }
 };
 const generateProgram = async (req, res) => {
-  const { numOfDays, level, weeks, gender } = req.body;
+  const { numOfDays, level, weeks, gender, category } = req.body;
   const userId = req.user.id;
-  const variations = await getRepo(Variation).find({
-    where: { level: isDev ? GymLevel.INTERMEDIATE : level },
+  const exRepo = getRepo(Exercise);
+  const variationRepo = getRepo(Variation);
+  const exercises = await exRepo.find({
+    where: { trainingType: { id: category } },
+    relations: { variations: true },
   });
-
+  const variations = isDev
+    ? await variationRepo.find()
+    : exercises
+        .flatMap((elem) => elem.variations)
+        .filter((v) => v.level === (isDev ? GymLevel.INTERMEDIATE : level));
   const exerciseList = variations.map((ex) => ex.title);
   const response = isDev
     ? dummyProgram

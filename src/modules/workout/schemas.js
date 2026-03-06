@@ -3,6 +3,9 @@ const { Gender } = require("./vault");
 
 const generateProgramSchema = z.object({
   level: z.string().min(1, { message: "Level is required" }),
+  category: z.number({
+    required_error: "Category is required",
+  }),
   gender: z.enum([Gender.FEMALE, Gender.MALE], {
     error: "Gender must be valid gender",
   }),

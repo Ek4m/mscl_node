@@ -34,6 +34,16 @@ module.exports = new EntitySchema({
       inverseSide: "exercise", // Points back to the 'exercise' field in VariationSchema
       cascade: true,
     },
+    trainingType: {
+      type: "many-to-one",
+      target: "TrainingType",
+      joinColumn: {
+        name: "training_type_id",
+      },
+      nullable: true,
+      onDelete: "RESTRICT",
+    },
+
     equipment: {
       type: "many-to-many",
       target: "Equipment",
