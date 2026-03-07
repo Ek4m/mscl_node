@@ -340,6 +340,54 @@ const editUserPlanDay = async (req, res) => {
   SuccessResponse(res, day);
 };
 
+const reusePlan = async (req, res) => {
+  const userId = req.user.id;
+  const { id } = req.body;
+  const planRepo = getRepo(UserWorkoutPlan);
+  const plan = await planRepo.findOne({
+    where: { id },
+    relations: {
+      template: true,
+      weeks: {
+        days: {
+          exercises: {
+            variation: true,
+          },
+        },
+      },
+    },
+  });
+  const newPlan = {
+    ...plan,
+    user: {
+      id: userId,
+    },
+    template: {
+      id: plan.template.id,
+    },
+    weeks: plan.weeks.map((week) => {
+      delete week.id;
+      return {
+        ...week,
+        days: week.days.map((day) => {
+          delete day.id;
+          return {
+            ...day,
+            exercises: day.exercises.map((ex) => {
+              delete ex.id;
+              ex.variation = { id: ex.variation.id };
+              return ex;
+            }),
+          };
+        }),
+      };
+    }),
+  };
+  delete newPlan.id;
+  const newUserPlan = await planRepo.save(newPlan);
+  SuccessResponse(res, newUserPlan);
+};
+
 module.exports = {
   getEquipments,
   generateProgram,
@@ -351,4 +399,5 @@ module.exports = {
   updateUserPlanStatus,
   getPlanById,
   createPlan,
+  reusePlan,
 };

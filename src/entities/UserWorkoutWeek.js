@@ -20,10 +20,6 @@ module.exports = new EntitySchema({
       nullable: true,
       comment: "e.g., 'Intro Week' or 'Deload Week'",
     },
-    isCompleted: {
-      type: "boolean",
-      default: false,
-    },
     createdAt: {
       type: "timestamp",
       createDate: true,

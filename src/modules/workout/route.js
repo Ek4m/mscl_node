@@ -12,6 +12,7 @@ const {
   createPlanFromTemplate,
   updateUserPlanStatus,
   editUserPlanDay,
+  reusePlan,
 } = require("./controller");
 const { validateSchema } = require("../auth/middlewares");
 const { generateProgramSchema } = require("./schemas");
@@ -25,8 +26,8 @@ route.post(
 route.post("/plan/custom-create", createPlan);
 route.post("/plan/plan-registration", createPlanFromTemplate);
 route.post("/plan/update-status", updateUserPlanStatus);
+route.post("/plan/reuse-plan", reusePlan);
 route.put("/edit-day", editUserPlanDay);
-
 
 route.get("/plans", getUsersPlans);
 route.get("/premade-plans", getPremadePlans);
