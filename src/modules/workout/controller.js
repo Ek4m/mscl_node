@@ -155,6 +155,7 @@ const getPlanById = async (req, res) => {
           days: {
             exercises: {
               variation: true,
+              metric: true,
             },
           },
         },
@@ -206,6 +207,10 @@ const createPlan = async (req, res) => {
                     variation: {
                       id: ex.id,
                     },
+                    metric: {
+                      id: ex.metricId,
+                    },
+                    targetValue: ex.targetValue,
                   };
                 }),
               };
@@ -233,6 +238,10 @@ const createPlan = async (req, res) => {
             targetReps: ex.targetReps,
             orderIndex: ex.orderIndex,
             targetSets: ex.targetSets,
+            metric: {
+              id: ex.metric.id,
+            },
+            targetValue: ex.targetValue,
           };
           if (ex.variation && ex.variation.id) {
             result.variation = { id: ex.variation.id };
@@ -259,6 +268,7 @@ const createPlanFromTemplate = async (req, res) => {
           days: {
             exercises: {
               variation: true,
+              metric: true,
             },
           },
         },
@@ -284,9 +294,13 @@ const createPlanFromTemplate = async (req, res) => {
                 targetReps: ex.targetReps,
                 orderIndex: ex.orderIndex,
                 targetSets: ex.targetSets,
+                targetValue: ex.targetValue,
               };
               if (ex.variation && ex.variation.id) {
                 result.variation = { id: ex.variation.id };
+              }
+              if (ex.metric) {
+                result.metric = { id: ex.metric.id };
               }
               return result;
             }),

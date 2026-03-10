@@ -13,18 +13,20 @@ module.exports = new EntitySchema({
 
     orderIndex: {
       type: "int",
-      comment: "Order of the exercise inside the day",
     },
     targetSets: {
       type: "int",
       nullable: true,
-      comment: "Default number of sets for this exercise",
     },
 
     targetReps: {
       type: "int",
       nullable: true,
-      comment: "Default number of reps per set",
+    },
+
+    targetValue: {
+      type: "float",
+      nullable: true,
     },
 
     createdAt: {
@@ -46,6 +48,14 @@ module.exports = new EntitySchema({
       type: "many-to-one",
       target: "Variation",
       joinColumn: { name: "variation_id" },
+      nullable: true,
+      onDelete: "RESTRICT",
+    },
+
+    metric: {
+      type: "many-to-one",
+      target: "Metric",
+      joinColumn: { name: "metric_id" },
       nullable: true,
       onDelete: "RESTRICT",
     },

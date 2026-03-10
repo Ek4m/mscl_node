@@ -26,6 +26,11 @@ module.exports = new EntitySchema({
       nullable: true,
     },
 
+    targetValue: {
+      type: "float",
+      nullable: true,
+    },
+
     createdAt: {
       type: "timestamp",
       createDate: true,
@@ -46,6 +51,14 @@ module.exports = new EntitySchema({
       type: "many-to-one",
       target: "Variation",
       joinColumn: { name: "variation_id" },
+      nullable: true,
+      onDelete: "RESTRICT",
+    },
+
+    metric: {
+      type: "many-to-one",
+      target: "Metric",
+      joinColumn: { name: "metric_id" },
       nullable: true,
       onDelete: "RESTRICT",
     },

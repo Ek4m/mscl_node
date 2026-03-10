@@ -9,69 +9,70 @@ const Equipment = require("../../entities/Equipment");
 const { In } = require("typeorm");
 const { MuscleGroups } = require("../workout/vault");
 const Plan = require("../../entities/Plan");
+const Metric = require("../../entities/Metric");
 
 const loadToExercises = async (req, res) => {
-  const mk = {
-    title: "4-Week Strength & Growth",
-    isWeeklyStatic: false,
-    isActive: true,
-    weeks: [
-      {
-        orderIndex: 1,
-        title: "Week 1: Foundations",
-        days: [
-          {
-            orderIndex: 1,
-            title: "Upper Body Push",
-            exercises: [
-              {
-                targetSets: 3,
-                targetReps: "10",
-                exerciseId: 101,
-                orderIndex: 1,
-              },
-              {
-                targetSets: 3,
-                targetReps: "12",
-                exerciseId: 12,
-                orderIndex: 2,
-              },
-            ],
-          },
-          {
-            orderIndex: 2,
-            title: "Lower Body Pull",
-            exercises: [
-              { targetSets: 4, targetReps: "8", exerciseId: 20, orderIndex: 1 },
-            ],
-          },
-        ],
-      },
-      {
-        orderIndex: 2,
-        title: "Week 2: Heavy Load",
-        days: [
-          {
-            orderIndex: 1,
-            title: "Upper Body Push (Heavy)",
-            exercises: [
-              { targetSets: 5, targetReps: "5", exerciseId: 11, orderIndex: 1 },
-            ],
-          },
-          {
-            orderIndex: 2,
-            title: "Lower Body Pull (Heavy)",
-            exercises: [
-              { targetSets: 5, targetReps: "5", exerciseId: 21, orderIndex: 2 },
-            ],
-          },
-        ],
-      },
-    ],
-  };
-  const planRepo = getRepo(Plan);
-  const planResult = await planRepo.save(mk);
-  SuccessResponse(res, planResult);
+  // const dummyWorkoutPlan = {
+  //   title: "Full Body Foundation",
+  //   description: "A mix of weighted, bodyweight, and time-based goals.",
+  //   weeks: [
+  //     {
+  //       orderIndex: 1,
+  //       days: [
+  //         {
+  //           dayName: "Monday - Strength & Core",
+  //           orderIndex: 1,
+  //           exercises: [
+  //             {
+  //               // SCENARIO 1: Standard Weighted (Bench Press)
+  //               variation: { id: 1 },
+  //               orderIndex: 1,
+  //               targetSets: 3,
+  //               targetReps: 12,
+  //               targetValue: 60, // 60kg
+  //               metric: { id: 1 }, // ID for 'kg'
+  //               addedWeight: 0,
+  //             },
+  //             {
+  //               // SCENARIO 2: Pure Bodyweight (Push-ups)
+  //               variation: { id: 2 },
+  //               orderIndex: 2,
+  //               targetSets: 3,
+  //               targetReps: 15,
+  //               targetValue: 0,
+  //               metric: { id: 4 }, // ID for 'reps'
+  //               addedWeight: 0,
+  //             },
+  //             {
+  //               // SCENARIO 3: Time-based with "Extra Muscle" (Weighted Plank)
+  //               variation: { id: 3 },
+  //               orderIndex: 3,
+  //               targetSets: 3,
+  //               targetReps: 1, // 1 hold
+  //               targetValue: 60, // 60 seconds
+  //               metric: { id: 3 }, // ID for 's'
+  //               addedWeight: 10, // 10kg on back
+  //             },
+  //             {
+  //               // SCENARIO 4: User-Decided Weight (Flexible Goal)
+  //               variation: { id: 4 },
+  //               orderIndex: 4,
+  //               targetSets: 3,
+  //               targetReps: 10,
+  //               targetValue: null, // User chooses weight during the workout
+  //               metric: { id: 1 }, // But we still tell them to use 'kg'
+  //               addedWeight: 0,
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // };
+  // const planRepo = getRepo(Plan);
+  // const planResult = await planRepo.save(dummyWorkoutPlan);
+  const deleted = await getRepo(Metric).delete({ id: 4 });
+  SuccessResponse(res, deleted);
 };
 
 const getPlan = async (req, res) => {

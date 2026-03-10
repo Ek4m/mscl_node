@@ -15,6 +15,7 @@ const UserWorkoutWeek = require("../../entities/UserWorkoutWeek");
 const ExerciseType = require("../../entities/ExerciseType");
 const UserWorkoutSet = require("../../entities/UserWorkoutSet");
 const Variation = require("../../entities/Variation");
+const Metric = require("../../entities/Metric");
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -40,6 +41,7 @@ const AppDataSource = new DataSource({
     UserWorkoutPlan,
     UserWorkoutWeek,
     UserWorkoutSet,
+    Metric,
   ],
 });
 module.exports = AppDataSource;

@@ -18,6 +18,14 @@ module.exports = new EntitySchema({
       type: "text",
       nullable: true,
     },
+    isBodyweight: {
+      type: "boolean",
+      default: false,
+    },
+    allowsWeight: {
+      type: "boolean",
+      default: true,
+    },
     createdAt: {
       type: "timestamp",
       createDate: true,
@@ -34,6 +42,7 @@ module.exports = new EntitySchema({
       inverseSide: "exercise", // Points back to the 'exercise' field in VariationSchema
       cascade: true,
     },
+
     trainingType: {
       type: "many-to-one",
       target: "TrainingType",
@@ -42,6 +51,16 @@ module.exports = new EntitySchema({
       },
       nullable: true,
       onDelete: "RESTRICT",
+    },
+
+    defaultMetric: {
+      type: "many-to-one",
+      target: "Metric",
+      joinColumn: {
+        name: "default_metric_id",
+      },
+      nullable: true,
+      onDelete: "SET NULL",
     },
 
     equipment: {

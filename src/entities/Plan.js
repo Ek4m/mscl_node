@@ -48,21 +48,6 @@ module.exports = new EntitySchema({
       nullable: true,
     },
 
-    isWeeklyStatic: {
-      type: "boolean",
-      default: false,
-    },
-
-    daysPerWeek: {
-      type: "int",
-      default: 1,
-    },
-
-    isTemplate: {
-      type: "boolean",
-      default: true,
-    },
-
     createdAt: {
       type: "timestamp",
       createDate: true,
