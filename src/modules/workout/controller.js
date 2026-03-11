@@ -356,6 +356,8 @@ const editUserPlanDay = async (req, res) => {
       variation: {
         id: ex.exerciseId,
       },
+      targetValue: Number(ex.targetValue) || 0,
+      metric: ex.metric,
     };
     return resultEx;
   });
