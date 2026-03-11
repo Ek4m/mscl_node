@@ -16,6 +16,7 @@ const { GymLevel, CreationType, PlanStatus } = require("./vault");
 const { Not } = require("typeorm");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 const Exercise = require("../../entities/Exercise");
+const Metric = require("../../entities/Metric");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -36,6 +37,8 @@ const generateProgram = async (req, res) => {
   const userId = req.user.id;
   const exRepo = getRepo(Exercise);
   const variationRepo = getRepo(Variation);
+  const metricRepo = getRepo(Metric);
+  const metrics = await metricRepo.find();
   const exercises = await exRepo.find({
     where: { trainingType: { id: category } },
     relations: { variations: true },
@@ -54,9 +57,10 @@ const generateProgram = async (req, res) => {
         gender,
         weeks,
         exerciseList,
+        metrics,
       );
 
-  const planDto = normalizeAIPlan(response, variations);
+  const planDto = normalizeAIPlan(response, variations, metrics);
   const newPlan = await getRepo(Plan).save({
     ...planDto,
     level,
@@ -82,6 +86,8 @@ const generateProgram = async (req, res) => {
             orderIndex: exIndex + 1,
             targetSets: ex.targetSets,
             variation: ex.variation ? { id: ex.variation.id } : null,
+            metric: { id: ex.metric.id },
+            targetValue: ex.targetValue,
           };
         }),
       })),
@@ -295,6 +301,9 @@ const createPlanFromTemplate = async (req, res) => {
                 orderIndex: ex.orderIndex,
                 targetSets: ex.targetSets,
                 targetValue: ex.targetValue,
+                metric: {
+                  id: ex.metric.id,
+                },
               };
               if (ex.variation && ex.variation.id) {
                 result.variation = { id: ex.variation.id };

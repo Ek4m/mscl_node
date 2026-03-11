@@ -72,17 +72,13 @@ const generateWorkoutProgram = async (
   gender,
   weeks,
   exerciseList,
+  metrics,
 ) => {
   const prompt = `You are a science-based gym trainer. Create a structured workout program based on:
-Level: ${level}, Weeks: ${weeks}, Frequency: ${days}/week, Gender: ${gender}, Exercises: ${exerciseList.join(",")}
+Level: ${level}, Num of weeks: ${weeks}, Frequency: ${days}/week, Gender: ${gender}, Exercises: ${exerciseList.join(",")}, Metrics:${metrics.map((m) => m.name).join(", ")}
 Return ONLY raw JSON:
 {
-  "title": "...",
-  "description": "...",
-  "weeks":[
-    {"orderIndex":1,"days":[{"orderIndex":1,"exercises":[{"orderIndex":1,"title":"exactly same that was provided","targetSets":12(only number),"targetReps":12(only single number, no string no amrap, no "8-12" just number)}]}]}
-  ]
-}
+  "title": "...(20-30 chars)","description": "...(40-50 chars)","weeks":[{"orderIndex":1,"days":[{"orderIndex":1,"exercises":[{"orderIndex":1,"title":"exactly same that was provided","targetSets":12(only number),"targetReps":12(only single number, no string no amrap, no "8-12" just number),"metric":"exactly same name with metrics list for targetValue","targetValue":"number(number type) type representing what amount  for 1 rep(ex: for running it  can be 500 (meters), for plank it is 60-120 (seconds), for bench press it is 50 (kilos))"}]}]}]}
 Ensure recovery and proper volume and num of exercises for ${level} with ${days}-day split.`;
   return sendToAI(prompt);
 };
@@ -149,7 +145,7 @@ const normalize = (str) => {
   return str.toLowerCase().trim();
 };
 
-function normalizeAIPlan(plan, variations) {
+function normalizeAIPlan(plan, variations, metrics) {
   const variationLookup = new Map();
   variations.forEach((v) => {
     variationLookup.set(normalize(v.title), {
@@ -164,11 +160,14 @@ function normalizeAIPlan(plan, variations) {
         ...day,
         exercises: day.exercises.map((aiEx) => {
           const match = variationLookup.get(normalize(aiEx.title));
+          const metric = metrics.find((m) => m.name === aiEx.metric);
           return {
             orderIndex: aiEx.orderIndex,
             targetSets: aiEx.targetSets,
             targetReps: aiEx.targetReps,
             variation: match ? { id: match.variationId } : null,
+            metric: { id: metric.id },
+            targetValue: aiEx.targetValue,
           };
         }),
       })),
