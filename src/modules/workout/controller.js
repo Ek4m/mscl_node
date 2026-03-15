@@ -160,7 +160,7 @@ const getPlanById = async (req, res) => {
         weeks: {
           days: {
             exercises: {
-              variation: true,
+              variation: { exercise: true },
               metric: true,
             },
           },
