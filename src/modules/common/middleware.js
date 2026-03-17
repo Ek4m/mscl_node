@@ -11,7 +11,7 @@ const errorHandler = (err, req, res, next) => {
 const logger = (req, res, next) => {
   console.log(`${req.method}: ${req.url}`);
   if (["post", "put", "patch"].includes(req.method.toLowerCase()))
-    console.log(req.body);
+    console.log("REQUEST BODY: ", JSON.stringify(req.body));
   console.log("______________________________________________________________");
   next();
 };

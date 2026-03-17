@@ -17,6 +17,7 @@ const { Not } = require("typeorm");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 const Exercise = require("../../entities/Exercise");
 const Metric = require("../../entities/Metric");
+const UserWorkoutSession = require("../../entities/UserWorkoutSession");
 
 const getEquipments = async (req, res) => {
   const files = req.files;
@@ -323,8 +324,12 @@ const createPlanFromTemplate = async (req, res) => {
 };
 
 const updateUserPlanStatus = async (req, res) => {
-  const { userPlanId, status } = req.body;
-  if (!userPlanId || !status) {
+  const { userPlanId, status, sessionRecords } = req.body;
+  if (
+    !userPlanId ||
+    !status ||
+    (status === PlanStatus.ARCHIVED && !sessionRecords.length)
+  ) {
     ErrorResponse(res, "Invalid parameters provided");
   } else {
     const planRepo = getRepo(UserWorkoutPlan);
@@ -332,9 +337,43 @@ const updateUserPlanStatus = async (req, res) => {
       where: { id: userPlanId, status: Not(PlanStatus.ARCHIVED) },
       select: ["id"],
     });
+    console.log("___PL:AN", plan);
     if (!plan) ErrorResponse(res, "Plan was not found");
     else {
       await planRepo.update({ id: plan.id }, { status });
+      console.log("++++STATUS++++", status);
+      if (status === PlanStatus.ARCHIVED) {
+        const sessionsMap = sessionRecords.reduce((acc, item) => {
+          if (!acc[item.sessionId]) {
+            acc[item.sessionId] = {
+              seconds: item.seconds,
+              startedAt: item.startedAt,
+              finishedAt: item.finishedAt,
+              completed: item.completed,
+              userWorkoutPlan: { id: item.userPlanId },
+              userWorkoutDay: { id: item.planDayId },
+              exercises: [],
+            };
+          }
+          acc[item.sessionId].exercises.push({
+            reps: item.reps,
+            doneValue: item.doneValue,
+            extraWeight: item.extraWeight,
+            orderIndex: item.orderIndex,
+            variation: { id: item.exerciseId },
+            userWorkoutExercise: { id: item.exerciseResultId },
+          });
+
+          return acc;
+        }, {});
+        const sessionRepo = getRepo(UserWorkoutSession);
+        const sessions = Object.values(sessionsMap);
+        for (const session of sessions) {
+          console.log(JSON.stringify(session));
+          const s = await sessionRepo.save(session);
+          console.log(s);
+        }
+      }
       SuccessResponse(res, true);
     }
   }
@@ -377,6 +416,7 @@ const reusePlan = async (req, res) => {
         days: {
           exercises: {
             variation: true,
+            metric: true,
           },
         },
       },
@@ -400,7 +440,6 @@ const reusePlan = async (req, res) => {
             ...day,
             exercises: day.exercises.map((ex) => {
               delete ex.id;
-              ex.variation = { id: ex.variation.id };
               return ex;
             }),
           };
