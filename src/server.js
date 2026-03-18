@@ -14,8 +14,8 @@ const { errorHandler, logger } = require("./modules/common/middleware");
 const { authorize } = require("./modules/auth/middlewares");
 
 const app = express();
-app.use(logger);
 app.use(express.json());
+app.use(logger);
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 

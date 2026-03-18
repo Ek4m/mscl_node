@@ -64,10 +64,12 @@ const freeze = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  const clientId = req.user.id;
   const userRepo = getRepo(User);
   const passwordResetRepo = getRepo(PasswordReset);
-  const user = await userRepo.findOne({ where: { id: clientId } });
+  const email = req.body.email;
+  if (!email) throw new Error("User not found");
+  const user = await userRepo.findOne({ where: { email } });
+  if (!user) throw new Error("User not found");
   const rawToken = crypto
     .randomBytes(4)
     .toString("hex")
@@ -75,17 +77,12 @@ const forgotPassword = async (req, res) => {
     .toUpperCase();
 
   await passwordResetRepo.delete({
-    user: { id: clientId },
+    user: { id: user.id },
   });
-
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(rawToken)
-    .digest("hex");
   await passwordResetRepo.save({
-    user: { id: clientId },
-    token: hashedToken,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 15 min
+    user: { id: user.id },
+    token: rawToken,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 5),
   });
   await mailer.sendMail({
     to: user.email,
@@ -96,10 +93,35 @@ const forgotPassword = async (req, res) => {
   SuccessResponse(res, { success: true });
 };
 
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  const passwordResetRepo = getRepo(PasswordReset);
+  const userRepo = getRepo(User);
+  const tokenFound = await passwordResetRepo.findOne({
+    where: { token },
+    relations: {
+      user: true,
+    },
+  });
+  if (!tokenFound) throw new Error("Token is not valid!");
+  const user = await userRepo.findOne({
+    where: { id: tokenFound.user.id },
+  });
+
+  if (!user) throw new Error("User was not found");
+  if (user.expiresAt < new Date()) throw new Error("Token expired!");
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+  await userRepo.save(user);
+  await passwordResetRepo.delete({ user });
+  SuccessResponse(res, true);
+};
+
 module.exports = {
   register,
   login,
   profile,
   freeze,
   forgotPassword,
+  resetPassword,
 };
