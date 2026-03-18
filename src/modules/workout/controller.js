@@ -337,11 +337,9 @@ const updateUserPlanStatus = async (req, res) => {
       where: { id: userPlanId, status: Not(PlanStatus.ARCHIVED) },
       select: ["id"],
     });
-    console.log("___PL:AN", plan);
     if (!plan) ErrorResponse(res, "Plan was not found");
     else {
       await planRepo.update({ id: plan.id }, { status });
-      console.log("++++STATUS++++", status);
       if (status === PlanStatus.ARCHIVED) {
         const sessionsMap = sessionRecords.reduce((acc, item) => {
           if (!acc[item.sessionId]) {
@@ -369,9 +367,7 @@ const updateUserPlanStatus = async (req, res) => {
         const sessionRepo = getRepo(UserWorkoutSession);
         const sessions = Object.values(sessionsMap);
         for (const session of sessions) {
-          console.log(JSON.stringify(session));
-          const s = await sessionRepo.save(session);
-          console.log(s);
+          await sessionRepo.save(session);
         }
       }
       SuccessResponse(res, true);

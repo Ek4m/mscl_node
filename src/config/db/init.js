@@ -17,6 +17,7 @@ const Variation = require("../../entities/Variation");
 const Metric = require("../../entities/Metric");
 const UserWorkoutSession = require("../../entities/UserWorkoutSession");
 const UserWorkoutSessionExercise = require("../../entities/UserWorkoutSessionExercise");
+const PasswordReset = require("../../entities/PasswordReset");
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -34,6 +35,7 @@ const AppDataSource = new DataSource({
     ExerciseEquipment,
     Variation,
     Plan,
+    PasswordReset,
     PlanDay,
     PlanWeek,
     PlanDayExercise,

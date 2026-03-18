@@ -20,6 +20,7 @@
     "flexsearch": "^0.8.212",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.0.2",
+    "nodemailer": "^8.0.3",
     "pg": "^8.18.0",
     "typeorm": "^0.3.28",
     "zod": "^4.3.5"
