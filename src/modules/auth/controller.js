@@ -9,11 +9,12 @@ const { getRepo } = require("./helpers");
 const PasswordReset = require("../../entities/PasswordReset");
 const mailer = require("../../config/mailer/config");
 const passwordKey = require("../../mail-templates/password-key");
+const { SALT_PASS } = require("./constants");
 
 const register = async (req, res) => {
   const { email, password, role, username } = req.body;
   const userRepository = getRepo(User);
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, SALT_PASS);
   const userExists = await userRepository.findOne({
     where: [{ email }, { username }],
   });
@@ -110,11 +111,32 @@ const resetPassword = async (req, res) => {
 
   if (!user) throw new Error("User was not found");
   if (user.expiresAt < new Date()) throw new Error("Token expired!");
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_PASS);
   user.password = hashedPassword;
   await userRepo.save(user);
   await passwordResetRepo.delete({ user });
   SuccessResponse(res, true);
+};
+
+const changePassword = async (req, res) => {
+  const { password, newPassword } = req.body;
+  const userId = req.user.id;
+  const userRepo = getRepo(User);
+  const user = await userRepo.findOne({
+    where: { id: userId },
+    select: ["id", "password"],
+  });
+  if (!user) throw new Error("User was not found");
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error("Current password is incorrect");
+
+  const hashedPassword = await bcrypt.hash(newPassword, SALT_PASS);
+
+  user.password = hashedPassword;
+  await userRepo.save(user);
+
+  return SuccessResponse(res, { message: "Password updated successfully" });
 };
 
 module.exports = {
@@ -124,4 +146,5 @@ module.exports = {
   freeze,
   forgotPassword,
   resetPassword,
+  changePassword,
 };

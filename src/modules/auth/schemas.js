@@ -47,4 +47,19 @@ const resetPasswordSchema = z
     message: "Passwords do not match",
   });
 
-module.exports = { registerSchema, loginSchema, resetPasswordSchema };
+const changePasswordSchema = z
+  .object({
+    password: passwordSchema,
+    newPassword: passwordSchema,
+    newPasswordRetyped: passwordSchema,
+  })
+  .refine((data) => data.newPassword === data.newPasswordRetyped, {
+    message: "Passwords do not match",
+    path: ["newPasswordRetyped"], // This targets the error specifically to the retyped field
+  })
+  .refine((data) => data.password !== data.newPassword, {
+    message: "New password cannot be the same as the current password",
+    path: ["newPassword"],
+  });
+
+module.exports = { registerSchema, loginSchema, resetPasswordSchema, changePasswordSchema };
