@@ -1,39 +1,22 @@
-const { dummyProgram, dummyEquipments } = require("./data");
+const { Not } = require("typeorm");
+const { dummyProgram } = require("./data");
 
 const { SuccessResponse, ErrorResponse } = require("../common/helpers");
 const { getRepo } = require("../auth/helpers");
-const { isDev } = require("../../helpers");
-const {
-  detectObjects,
-  generateWorkoutProgram,
-  normalizeAIPlan,
-} = require("./helpers");
+const { isDev, handleTransaction } = require("../../helpers");
+const { generateWorkoutProgram, normalizeAIPlan } = require("./helpers");
 
 const Plan = require("../../entities/Plan");
 const UserWorkoutPlan = require("../../entities/UserWorkoutPlan");
-const Variation = require("../../entities/Variation");
-const { GymLevel, CreationType, PlanStatus } = require("./vault");
-const { Not } = require("typeorm");
-const UserWorkoutDay = require("../../entities/UserWorkoutDay");
-const Exercise = require("../../entities/Exercise");
 const Metric = require("../../entities/Metric");
+const Exercise = require("../../entities/Exercise");
+const Variation = require("../../entities/Variation");
 const UserWorkoutSession = require("../../entities/UserWorkoutSession");
+const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 
-const getEquipments = async (req, res) => {
-  const files = req.files;
-  if (!files || files.length === 0) {
-    ErrorResponse(res, "No images provided", 400);
-  } else {
-    try {
-      const response = isDev ? dummyEquipments : await detectObjects(files);
-      SuccessResponse(res, response);
-    } catch (error) {
-      console.error("Error during image classification:", error);
-      ErrorResponse(res, "Internal Server Error");
-    }
-  }
-};
-const generateProgram = async (req, res) => {
+const { GymLevel, CreationType, PlanStatus } = require("./vault");
+
+const generateProgram = handleTransaction(async (req, res) => {
   const { numOfDays, level, weeks, gender, category } = req.body;
   const userId = req.user.id;
   const exRepo = getRepo(Exercise);
@@ -111,7 +94,7 @@ const generateProgram = async (req, res) => {
     },
   });
   SuccessResponse(res, plan);
-};
+});
 
 const getUsersPlans = async (req, res) => {
   const plans = await getRepo(UserWorkoutPlan).find({
@@ -189,7 +172,7 @@ const getPlanRegistration = async (req, res) => {
   }
 };
 
-const createPlan = async (req, res) => {
+const createPlan = handleTransaction(async (req, res) => {
   const { plan, title } = req.body;
   const userId = req.user.id;
   const mappedPlan = {
@@ -260,9 +243,9 @@ const createPlan = async (req, res) => {
   };
   const customPlan = await getRepo(UserWorkoutPlan).save(newUserPlan);
   SuccessResponse(res, customPlan);
-};
+});
 
-const createPlanFromTemplate = async (req, res) => {
+const createPlanFromTemplate = handleTransaction(async (req, res) => {
   const { planId } = req.body;
   const userId = req.user.id;
   if (!planId) {
@@ -321,9 +304,9 @@ const createPlanFromTemplate = async (req, res) => {
       SuccessResponse(res, customPlan);
     }
   }
-};
+});
 
-const updateUserPlanStatus = async (req, res) => {
+const updateUserPlanStatus = handleTransaction(async (req, res) => {
   const { userPlanId, status, sessionRecords } = req.body;
   if (
     !userPlanId ||
@@ -373,9 +356,9 @@ const updateUserPlanStatus = async (req, res) => {
       SuccessResponse(res, true);
     }
   }
-};
+});
 
-const editUserPlanDay = async (req, res) => {
+const editUserPlanDay = handleTransaction(async (req, res) => {
   const { dayId, exercises } = req.body;
   const dayRepo = getRepo(UserWorkoutDay);
   const day = await dayRepo.findOne({
@@ -398,9 +381,9 @@ const editUserPlanDay = async (req, res) => {
   });
   await dayRepo.save(day);
   SuccessResponse(res, day);
-};
+});
 
-const reusePlan = async (req, res) => {
+const reusePlan = handleTransaction(async (req, res) => {
   const userId = req.user.id;
   const { id } = req.body;
   const planRepo = getRepo(UserWorkoutPlan);
@@ -446,10 +429,9 @@ const reusePlan = async (req, res) => {
   delete newPlan.id;
   const newUserPlan = await planRepo.save(newPlan);
   SuccessResponse(res, newUserPlan);
-};
+});
 
 module.exports = {
-  getEquipments,
   generateProgram,
   getUsersPlans,
   getPremadePlans,

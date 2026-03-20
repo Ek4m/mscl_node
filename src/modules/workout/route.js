@@ -2,7 +2,6 @@ const route = require("express").Router();
 const uploader = require("../../config/multer/init");
 
 const {
-  getEquipments,
   generateProgram,
   getUsersPlans,
   getPlanById,
@@ -17,7 +16,6 @@ const {
 const { validateSchema } = require("../auth/middlewares");
 const { generateProgramSchema } = require("./schemas");
 
-route.post("/detect", uploader.array("images", 6), getEquipments);
 route.post(
   "/generate-program",
   validateSchema(generateProgramSchema),
