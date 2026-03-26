@@ -14,7 +14,7 @@ const Variation = require("../../entities/Variation");
 const UserWorkoutSession = require("../../entities/UserWorkoutSession");
 const UserWorkoutDay = require("../../entities/UserWorkoutDay");
 
-const { GymLevel, CreationType, PlanStatus } = require("./vault");
+const { GymLevel, CreationType, PlanStatus, Gender } = require("./vault");
 
 const generateProgram = handleTransaction(async (req, res) => {
   const { numOfDays, level, weeks, gender, category } = req.body;
@@ -110,6 +110,11 @@ const getUsersPlans = async (req, res) => {
 };
 
 const getPremadePlans = async (req, res) => {
+  const params = req.query;
+  const where = {};
+  if ([Gender.FEMALE, Gender.MALE].includes(params.gender)) {
+    where.gender = params.gender;
+  }
   const plans = await getRepo(Plan).find({
     relations: {
       weeks: {
@@ -120,7 +125,7 @@ const getPremadePlans = async (req, res) => {
         },
       },
     },
-    where: { creationType: CreationType.PROFESSIONAL },
+    where: { creationType: CreationType.PROFESSIONAL, ...where },
   });
   SuccessResponse(res, plans);
 };
