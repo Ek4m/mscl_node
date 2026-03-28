@@ -97,13 +97,14 @@ const generateProgram = handleTransaction(async (req, res) => {
 });
 
 const getUsersPlans = async (req, res) => {
+  const { status } = req.query;
   const plans = await getRepo(UserWorkoutPlan).find({
     relations: {
       template: true,
       weeks: true,
     },
     where: {
-      status: Not(PlanStatus.ARCHIVED),
+      status: status ?? Not(PlanStatus.ARCHIVED),
     },
   });
   SuccessResponse(res, plans);
