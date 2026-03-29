@@ -32,6 +32,14 @@ module.exports = new EntitySchema({
       onDelete: "CASCADE",
     },
 
+    
+    sessions: {
+      type: "one-to-many",
+      target: "WorkoutSession",
+      inverseSide: "userWorkoutDay",
+      cascade: true,
+    },
+
     exercises: {
       type: "one-to-many",
       target: "UserWorkoutExercise",

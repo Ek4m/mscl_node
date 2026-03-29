@@ -134,6 +134,13 @@ const getPremadePlans = async (req, res) => {
 const getPlanById = async (req, res) => {
   const { id } = req.params;
   const clientId = req.user.id;
+  const { sessions, status } = req.query;
+  const isSession = Number(sessions) === 1;
+  const sessionConfig = isSession
+    ? {
+        exercises: true,
+      }
+    : false;
   if (!id) {
     ErrorResponse(res, "No parameter provided");
   } else {
@@ -143,12 +150,13 @@ const getPlanById = async (req, res) => {
         user: {
           id: clientId,
         },
-        status: Not(PlanStatus.ARCHIVED),
+        status: status || Not(PlanStatus.ARCHIVED),
       },
       relations: {
         template: true,
         weeks: {
           days: {
+            sessions: sessionConfig,
             exercises: {
               variation: { exercise: true },
               metric: true,

@@ -19,6 +19,9 @@ module.exports = new EntitySchema({
     doneValue: {
       type: "int",
     },
+    workoutExerciseId: {
+      name: "user_workout_exercise_id",
+    },
     extraWeight: {
       type: "int",
       nullable: true,
